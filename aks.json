@@ -9,6 +9,12 @@
     }
   },
   "parameters": {
+    "ResourcePrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "provide a 2-13 character prefix for all resources."
+      }
+    },
     "clusterName": {
       "type": "string",
       "defaultValue": "aks101clusterr",
@@ -64,14 +70,14 @@
     "disks_glamvm_disk1": {
       // "defaultValue": "/subscriptions/f4e709ca-ccb8-4e46-b0b0-822db3762d86/resourceGroups/GLAMDEV-RG/providers/Microsoft.Compute/disks/glamvm_disk1_0d11046b172540ef8cbafa8f85f6578c",
       "type": "String",
-       "metadata": {
+      "metadata": {
         "description": "virtual disk name"
       }
     },
     "networkInterfaces": {
       // "defaultValue": "/subscriptions/f4e709ca-ccb8-4e46-b0b0-822db3762d86/resourceGroups/glamdev-rg/providers/Microsoft.Network/networkInterfaces/glamvm606_z1",
       "type": "String",
-        "metadata": {
+      "metadata": {
         "description": "virtual disk name"
       }
     },
@@ -93,6 +99,10 @@
       "metadata": {
         "description": "Specifies whether to create the cluster as a private cluster or not."
       }
+    },
+    "accounts_glamopenai_name": {
+      "defaultValue": "glamopenai",
+      "type": "String"
     }
   },
   "resources": [
@@ -131,75 +141,177 @@
         }
       }
     },
-      {
-            "type": "Microsoft.Compute/virtualMachines",
-            "apiVersion": "2023-03-01",
-            "name": "[parameters('virtualMachines_name')]",
-            "location": "centralindia",
-            "zones": [
-                "1"
-            ],
-            "properties": {
-                "hardwareProfile": {
-                    "vmSize": "Standard_B2s"
-                },
-                "storageProfile": {
-                    "imageReference": {
-                        "publisher": "microsoftwindowsdesktop",
-                        "offer": "windows-11",
-                        "sku": "win11-22h2-pro",
-                        "version": "latest"
-                    },
-                    "osDisk": {
-                        "osType": "Windows",
-                        "name": "[concat(parameters('virtualMachines_name'), '_disk1_0d11046b172540ef8cbafa8f85f6578c')]",
-                        "createOption": "FromImage",
-                        "caching": "ReadWrite",
-                        "managedDisk": {
-                            "storageAccountType": "StandardSSD_LRS",
-                            "id": "[parameters('disks_glamvm_disk1')]"
-                        },
-                        "deleteOption": "Delete",
-                        "diskSizeGB": 127
-                    },
-                    "dataDisks": [],
-                    "diskControllerType": "SCSI"
-                },
-                "osProfile": {
-                    "computerName": "[parameters('virtualMachines_name')]",
-                    "adminUsername": "[parameters('virtualMachines_name')]",
-                    "windowsConfiguration": {
-                        "provisionVMAgent": true,
-                        "enableAutomaticUpdates": true,
-                        "patchSettings": {
-                            "patchMode": "AutomaticByOS",
-                            "assessmentMode": "ImageDefault",
-                            "enableHotpatching": false
-                        },
-                        "enableVMAgentPlatformUpdates": false
-                    },
-                    "secrets": [],
-                    "allowExtensionOperations": true,
-                    "requireGuestProvisionSignal": true
-                },
-                "networkProfile": {
-                    "networkInterfaces": [
-                        {
-                            "id": "[parameters('networkInterfaces')]",
-                            "properties": {
-                                "deleteOption": "Detach"
-                            }
-                        }
-                    ]
-                },
-                "diagnosticsProfile": {
-                    "bootDiagnostics": {
-                        "enabled": true
-                    }
-                },
-                "licenseType": "Windows_Client"
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2023-03-01",
+      "name": "[parameters('virtualMachines_name')]",
+      "location": "centralindia",
+      "zones": [
+        "1"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "Standard_B2s"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "microsoftwindowsdesktop",
+            "offer": "windows-11",
+            "sku": "win11-22h2-pro",
+            "version": "latest"
+          },
+          "osDisk": {
+            "osType": "Windows",
+            "name": "[concat(parameters('virtualMachines_name'), '_disk1_0d11046b172540ef8cbafa8f85f6578c')]",
+            "createOption": "FromImage",
+            "caching": "ReadWrite",
+            "managedDisk": {
+              "storageAccountType": "StandardSSD_LRS",
+              "id": "[parameters('disks_glamvm_disk1')]"
+            },
+            "deleteOption": "Delete",
+            "diskSizeGB": 127
+          },
+          "dataDisks": [],
+          "diskControllerType": "SCSI"
+        },
+        "osProfile": {
+          "computerName": "[parameters('virtualMachines_name')]",
+          "adminUsername": "[parameters('virtualMachines_name')]",
+          "windowsConfiguration": {
+            "provisionVMAgent": true,
+            "enableAutomaticUpdates": true,
+            "patchSettings": {
+              "patchMode": "AutomaticByOS",
+              "assessmentMode": "ImageDefault",
+              "enableHotpatching": false
+            },
+            "enableVMAgentPlatformUpdates": false
+          },
+          "secrets": [],
+          "allowExtensionOperations": true,
+          "requireGuestProvisionSignal": true
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[parameters('networkInterfaces')]",
+              "properties": {
+                "deleteOption": "Detach"
+              }
             }
-        }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": true
+          }
+        },
+        "licenseType": "Windows_Client"
+      }
+    },
+    {
+      "type": "Microsoft.CognitiveServices/accounts",
+      "apiVersion": "2023-10-01-preview",
+      "name": "[parameters('accounts_glamopenai_name')]",
+      "location": "canadaeast",
+      "sku": {
+        "name": "S0"
+      },
+      "kind": "OpenAI",
+      "properties": {
+        "customSubDomainName": "[parameters('accounts_glamopenai_name')]",
+        "networkAcls": {
+          "defaultAction": "Allow",
+          "virtualNetworkRules": [],
+          "ipRules": []
+        },
+        "publicNetworkAccess": "Enabled"
+      }
+    },
+    {
+      "type": "Microsoft.CognitiveServices/accounts/deployments",
+      "apiVersion": "2023-10-01-preview",
+      "name": "[concat(parameters('accounts_glamopenai_name'), '/openai')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.CognitiveServices/accounts', parameters('accounts_glamopenai_name'))]"
+      ],
+      "sku": {
+        "name": "Standard",
+        "capacity": 120
+      },
+      "properties": {
+        "model": {
+          "format": "OpenAI",
+          "name": "gpt-35-turbo",
+          "version": "0613"
+        },
+        "versionUpgradeOption": "OnceNewDefaultVersionAvailable",
+        "currentCapacity": 120,
+        "raiPolicyName": "Microsoft.Default"
+      }
+    },
+    {
+      "type": "Microsoft.CognitiveServices/accounts/raiPolicies",
+      "apiVersion": "2023-10-01-preview",
+      "name": "[concat(parameters('accounts_glamopenai_name'), '/Microsoft.Default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.CognitiveServices/accounts', parameters('accounts_glamopenai_name'))]"
+      ],
+      "properties": {
+        "mode": "Blocking",
+        "contentFilters": [
+          {
+            "allowedContentLevel": "Medium",
+            "blocking": true,
+            "enabled": true,
+            "source": "Prompt"
+          },
+          {
+            "allowedContentLevel": "Medium",
+            "blocking": true,
+            "enabled": true,
+            "source": "Completion"
+          },
+          {
+            "allowedContentLevel": "Medium",
+            "blocking": true,
+            "enabled": true,
+            "source": "Prompt"
+          },
+          {
+            "allowedContentLevel": "Medium",
+            "blocking": true,
+            "enabled": true,
+            "source": "Completion"
+          },
+          {
+            "allowedContentLevel": "Medium",
+            "blocking": true,
+            "enabled": true,
+            "source": "Prompt"
+          },
+          {
+            "allowedContentLevel": "Medium",
+            "blocking": true,
+            "enabled": true,
+            "source": "Completion"
+          },
+          {
+            "allowedContentLevel": "Medium",
+            "blocking": true,
+            "enabled": true,
+            "source": "Prompt"
+          },
+          {
+            "allowedContentLevel": "Medium",
+            "blocking": true,
+            "enabled": true,
+            "source": "Completion"
+          }
+        ]
+      }
+    }
 
   ],
   "outputs": {

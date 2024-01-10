@@ -11,7 +11,7 @@
   "parameters": {
     "clusterName": {
       "type": "string",
-      "defaultValue": "aks101cluster",
+      "defaultValue": "aks101clusterr",
       "metadata": {
         "description": "The name of the Managed Cluster resource."
       }
@@ -32,7 +32,7 @@
     "osDiskSizeGB": {
       "type": "int",
       "defaultValue": 0,
-      "maxValue": 1023,
+      "maxValue": 1024,
       "minValue": 0,
       "metadata": {
         "description": "Disk size (in GB) to provision for each of the agent pool nodes. This value ranges from 0 to 1023. Specifying 0 will apply the default disk size for that agentVMSize."
@@ -40,7 +40,7 @@
     },
     "agentCount": {
       "type": "int",
-      "defaultValue": 3,
+      "defaultValue": 5,
       "maxValue": 50,
       "minValue": 1,
       "metadata": {

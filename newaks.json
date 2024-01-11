@@ -9,18 +9,36 @@
         }
     },
     "parameters": {
-        "storageAccounts_glamblobstorage_name": {
-            "defaultValue": "glamdemostorage",
-            "type": "String"
+        "ResourcePrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "provide a 2-13 character prefix for all resources."
+            }
+        },
+        "Location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources."
+            }
+        },
+        "StorageAccountName": {
+            "type": "string",
+            "defaultValue": "[format('{0}str', parameters('ResourcePrefix'))]",
+            "metadata": {
+                "description": "Name of Storage Account"
+            }
         }
     },
-    "variables": {},
+    "variables": {
+        "BlobContainerName": "documents"
+    },
     "resources": [
         {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2023-01-01",
-            "name": "[parameters('storageAccounts_glamblobstorage_name')]",
-            "location": "centralindia",
+            "name": "[parameters('StorageAccountName')]",
+            "location": "[parameters('Location')]",
             "kind": "StorageV2",
             "tags": {
                 "ProjectType": "aoai-your-data-service"
@@ -35,9 +53,9 @@
         {
             "type": "Microsoft.Storage/storageAccounts/queueServices",
             "apiVersion": "2023-01-01",
-            "name": "[concat(parameters('storageAccounts_glamblobstorage_name'), '/default')]",
+            "name": "[format('{0}/{1}', parameters('StorageAccountName'), 'default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_glamblobstorage_name'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName'))]"
             ],
             "properties": {
                 "cors": {
@@ -45,32 +63,15 @@
                 }
             }
         },
-        {
-            "type": "Microsoft.Storage/storageAccounts/tableServices",
-            "apiVersion": "2023-01-01",
-            "name": "[concat(parameters('storageAccounts_glamblobstorage_name'), '/default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_glamblobstorage_name'))]"
-            ],
-            "properties": {
-                "cors": {
-                    "corsRules": []
-                }
-            }
-        },
-
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
             "apiVersion": "2023-01-01",
-            "name": "[concat(parameters('storageAccounts_glamblobstorage_name'), '/default/glamfilecontainer')]",
+            "name": "[format('{0}/default/{1}', parameters('StorageAccountName'), variables('BlobContainerName'))]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_glamblobstorage_name'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_glamblobstorage_name'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('StorageAccountName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts',  parameters('StorageAccountName'))]"
             ],
             "properties": {
-                "immutableStorageWithVersioning": {
-                    "enabled": false
-                },
                 "defaultEncryptionScope": "$account-encryption-key",
                 "denyEncryptionScopeOverride": false,
                 "publicAccess": "Blob"
@@ -79,27 +80,22 @@
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
             "apiVersion": "2023-01-01",
-            "name": "[concat(parameters('storageAccounts_glamblobstorage_name'), '/default/translayedfiles')]",
+            "name": "[format('{0}/default/config', parameters('StorageAccountName'))]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_glamblobstorage_name'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_glamblobstorage_name'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('StorageAccountName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName'))]"
             ],
             "properties": {
-                "immutableStorageWithVersioning": {
-                    "enabled": false
-                },
-                "defaultEncryptionScope": "$account-encryption-key",
-                "denyEncryptionScopeOverride": false,
                 "publicAccess": "None"
             }
         },
         {
             "type": "Microsoft.Storage/storageAccounts/queueServices/queues",
             "apiVersion": "2023-01-01",
-            "name": "[concat(parameters('storageAccounts_glamblobstorage_name'), '/default/azure-webjobs-blobtrigger-desktopcp00vms-814398703')]",
+            "name": "[format('{0}/{1}/{2}', parameters('StorageAccountName'), 'default', 'doc-processing')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/queueServices', parameters('storageAccounts_glamblobstorage_name'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_glamblobstorage_name'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts/queueServices', parameters('StorageAccountName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName'))]"
             ],
             "properties": {
                 "metadata": {}

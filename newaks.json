@@ -127,7 +127,27 @@
             "metadata": {
                 "description": "Name of Azure Translator Account"
             }
+        },
+        "ContentmoderatorAcountName": {
+            // "defaultValue": "contentmoderatorglam",
+            "defaultValue": "[format('{0}ContentModerator', parameters('ResourcePrefix'))]",
+            "type": "String",
+            "metadata": {
+                "description": "Name of Azure Translator Account"
+            }
+        },
+         "TextAnalyticsAccountName": {
+            // "defaultValue": "textanalyticsvach",
+            "defaultValue": "[format('{0}aztextanalytics', parameters('ResourcePrefix'))]",
+            "type": "String",
+             "metadata": {
+                "description": "Name of Azure Translator Account"
+            }
         }
+        // "searchServices_textanalyticsvach_as36vn4dlyuy47k_externalid": {
+        //     "defaultValue": "/subscriptions/f4e709ca-ccb8-4e46-b0b0-822db3762d86/resourceGroups/vach_onelogica/providers/Microsoft.Search/searchServices/textanalyticsvach-as36vn4dlyuy47k",
+        //     "type": "String"
+        // }
         // "AzureOpenAITemperature": {
         //     "type": "string",
         //     "defaultValue": "0",
@@ -333,11 +353,11 @@
                 }
             }
         },
-         {
+        {
             "type": "Microsoft.CognitiveServices/accounts",
             "apiVersion": "2023-10-01-preview",
             "name": "[parameters('AzureTranslatorAccountName')]",
-           "location": "[parameters('Location')]",
+            "location": "[parameters('Location')]",
             "sku": {
                 "name": "S1"
             },
@@ -349,7 +369,41 @@
                 "customSubDomainName": "[parameters('AzureTranslatorAccountName')]",
                 "publicNetworkAccess": "Enabled"
             }
+        },
+        {
+            "type": "Microsoft.CognitiveServices/accounts",
+            "apiVersion": "2023-10-01-preview",
+            "name": "[parameters('ContentmoderatorAcountName')]",
+            "location": "[parameters('Location')]",
+            "sku": {
+                "name": "F0"
+            },
+            "kind": "ContentModerator",
+            "identity": {
+                "type": "None"
+            },
+            "properties": {
+                "customSubDomainName": "[parameters('ContentmoderatorAcountName')]",
+                "publicNetworkAccess": "Enabled"
+            }
+        },
+          {
+            "type": "Microsoft.CognitiveServices/accounts",
+            "apiVersion": "2023-10-01-preview",
+            "name": "[parameters('TextAnalyticsAccountName')]",
+            "location": "[parameters('Location')]",
+            "sku": {
+                "name": "F0"
+            },
+            "kind": "TextAnalytics",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "publicNetworkAccess": "Enabled"
+            }
         }
+
 
     ]
 }

@@ -376,7 +376,7 @@
             "name": "[parameters('ContentmoderatorAcountName')]",
             "location": "[parameters('Location')]",
             "sku": {
-                "name": "F0"
+                "name": "S0"
             },
             "kind": "ContentModerator",
             "identity": {

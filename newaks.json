@@ -119,6 +119,14 @@
             "metadata": {
                 "description": "Azure OpenAI GPT Model Version"
             }
+        },
+        "AzureTranslatorAccountName": {
+            // "defaultValue": "glamdoctranslator",
+            "defaultValue": "[format('{0}aztranslator', parameters('ResourcePrefix'))]",
+            "type": "String",
+            "metadata": {
+                "description": "Name of Azure Translator Account"
+            }
         }
         // "AzureOpenAITemperature": {
         //     "type": "string",
@@ -257,7 +265,7 @@
             ],
             "sku": {
                 "name": "Standard",
-                "capacity":120
+                "capacity": 120
             },
             "properties": {
                 "model": {
@@ -324,6 +332,24 @@
                     "version": "[parameters('AzureOpenAIEmbeddingModelVersion')]"
                 }
             }
+        },
+         {
+            "type": "Microsoft.CognitiveServices/accounts",
+            "apiVersion": "2023-10-01-preview",
+            "name": "[parameters('AzureTranslatorAccountName')]",
+           "location": "[parameters('Location')]",
+            "sku": {
+                "name": "S1"
+            },
+            "kind": "TextTranslation",
+            "identity": {
+                "type": "None"
+            },
+            "properties": {
+                "customSubDomainName": "[parameters('AzureTranslatorAccountName')]",
+                "publicNetworkAccess": "Enabled"
+            }
         }
+
     ]
 }

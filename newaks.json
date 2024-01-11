@@ -28,10 +28,151 @@
             "metadata": {
                 "description": "Name of Storage Account"
             }
+        },
+        "OpenaiAccountName": {
+            "type": "String",
+            "defaultValue": "[format('{0}oai', parameters('ResourcePrefix'))]",
+            "metadata": {
+                "description": "Name of OpenAi Account"
+            }
+        },
+        "AzureOpenAIGPTModel": {
+            "type": "string",
+            "defaultValue": "gpt-35-turbo",
+            "metadata": {
+                "description": "Azure OpenAI GPT Model Deployment Name"
+            }
+        },
+        "AzureOpenAIGPTModelName": {
+            "type": "string",
+            "defaultValue": "gpt-35-turbo",
+            "metadata": {
+                "description": "Azure OpenAI GPT Model Name"
+            }
+        },
+        "AzureOpenAIGPTModelVersion": {
+            "type": "string",
+            "defaultValue": "0613",
+            "metadata": {
+                "description": "Azure OpenAI GPT Model Version"
+            }
+        },
+        "AzureOpenAIGPTModel16k": {
+            "type": "string",
+            "defaultValue": "gpt-35-turbo-16k",
+            "metadata": {
+                "description": "Azure OpenAI 2nd GPT Model Deployment Name"
+            }
+        },
+        "AzureOpenAIGPTModelName16k": {
+            "type": "string",
+            "defaultValue": "gpt-35-turbo-16k",
+            "metadata": {
+                "description": "Azure OpenAI 2nd GPT Model Name"
+            }
+        },
+        "AzureOpenAIGPTModelVersion16k": {
+            "type": "string",
+            "defaultValue": "0613",
+            "metadata": {
+                "description": "Azure OpenAI 2nd GPT Model Version"
+            }
+        },
+        "AzureOpenAIGPT4Model": {
+            "type": "string",
+            "defaultValue": "gpt-4-32k",
+            "metadata": {
+                "description": "Azure OpenAI  GPT 4 Model Deployment Name"
+            }
+        },
+        "AzureOpenAIGPT4ModelName": {
+            "type": "string",
+            "defaultValue": "gpt-4-32k",
+            "metadata": {
+                "description": "Azure OpenAI  GPT 4 Model Name"
+            }
+        },
+        "AzureOpenAIGPT4ModelVersion": {
+            "type": "string",
+            "defaultValue": "0613",
+            "metadata": {
+                "description": "Azure OpenAI GPT 4 Model Version"
+            }
+        },
+        "AzureOpenAIEmbeddingModel": {
+            "type": "string",
+            "defaultValue": "text-embedding-ada-002",
+            "metadata": {
+                "description": "Azure OpenAI Embedding Model Deployment Name"
+            }
+        },
+        "AzureOpenAIEmbeddingModelName": {
+            "type": "string",
+            "defaultValue": "text-embedding-ada-002",
+            "metadata": {
+                "description": "Azure OpenAI GPT Model Name"
+            }
+        },
+        "AzureOpenAIEmbeddingModelVersion": {
+            "type": "string",
+            "defaultValue": "2",
+            "metadata": {
+                "description": "Azure OpenAI GPT Model Version"
+            }
+        },
+        "AzureOpenAITemperature": {
+            "type": "string",
+            "defaultValue": "0",
+            "metadata": {
+                "description": "Azure OpenAI Temperature"
+            }
+        },
+        "AzureOpenAITopP": {
+            "type": "string",
+            "defaultValue": "1",
+            "metadata": {
+                "description": "Azure OpenAI Top P"
+            }
+        },
+        "AzureOpenAIMaxTokens": {
+            "type": "string",
+            "defaultValue": "1000",
+            "metadata": {
+                "description": "Azure OpenAI Max Tokens"
+            }
+        },
+        "AzureOpenAIStopSequence": {
+            "type": "string",
+            "defaultValue": "\n",
+            "metadata": {
+                "description": "Azure OpenAI Stop Sequence"
+            }
+        },
+        "AzureOpenAISystemMessage": {
+            "type": "string",
+            "defaultValue": "You are an AI assistant that helps people find information.",
+            "metadata": {
+                "description": "Azure OpenAI System Message"
+            }
+        },
+        "AzureOpenAIApiVersion": {
+            "type": "string",
+            "defaultValue": "2023-07-01-preview",
+            "metadata": {
+                "description": "Azure OpenAI Api Version"
+            }
+        },
+        "AzureOpenAIStream": {
+            "type": "string",
+            "defaultValue": "true",
+            "metadata": {
+                "description": "Whether or not to stream responses from Azure OpenAI"
+            }
         }
     },
     "variables": {
-        "BlobContainerName": "glamdocuments"
+        "BlobContainerName": "glamdocuments",
+        "OpenAiName": "glam_openai"
     },
     "resources": [
         {
@@ -92,6 +233,96 @@
             ],
             "properties": {
                 "metadata": {}
+            }
+        },
+        {
+            "type": "Microsoft.CognitiveServices/accounts",
+            "apiVersion": "2023-10-01-preview",
+            "name": "[parameters('OpenaiAccountName')]",
+            "location": "canadaeast",
+            "kind": "OpenAI",
+            "sku": {
+                "name": "S0"
+            },
+            "properties": {
+                "customSubDomainName": "[parameters('OpenaiAccountName')]"
+            }
+        },
+        {
+            "type": "Microsoft.CognitiveServices/accounts/deployments",
+            "apiVersion": "2023-10-01-preview",
+            "name": "[format('{0}/{1}', parameters('OpenaiAccountName'), parameters('AzureOpenAIGPTModelName'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.CognitiveServices/accounts', parameters('OpenaiAccountName'))]"
+            ],
+            "sku": {
+                "name": "Standard",
+                "capacity": 120
+            },
+            "properties": {
+                "model": {
+                    "format": "OpenAI",
+                    "name": "[parameters('AzureOpenAIGPTModel')]",
+                    "version": "[parameters('AzureOpenAIGPTModelVersion')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.CognitiveServices/accounts/deployments",
+            "apiVersion": "2023-10-01-preview",
+            "name": "[format('{0}/{1}',parameters('OpenaiAccountName'),parameters('AzureOpenAIGPTModelName16k'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.CognitiveServices/accounts', parameters('OpenaiAccountName'))]"
+            ],
+            "sku": {
+                "name": "Standard",
+                "capacity": 120
+            },
+            "properties": {
+                "model": {
+                    "format": "OpenAI",
+                    "name": "[parameters('AzureOpenAIGPTModel16k')]",
+                    "version": "[parameters('AzureOpenAIGPTModelVersion16k')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.CognitiveServices/accounts/deployments",
+            "apiVersion": "2023-10-01-preview",
+            "name": "[concat(parameters('OpenaiAccountName'),parameters('AzureOpenAIGPT4ModelName'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.CognitiveServices/accounts', parameters('OpenaiAccountName'))]"
+            ],
+            "sku": {
+                "name": "Standard",
+                "capacity": 10
+            },
+            "properties": {
+                "model": {
+                    "format": "OpenAI",
+                    "name": "[parameters('AzureOpenAIGPT4Model')]",
+                    "version": "[parameters('AzureOpenAIGPT4ModelVersion')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.CognitiveServices/accounts/deployments",
+            "apiVersion": "2023-10-01-preview",
+            "name": "[format('{0}/{1}', parameters('OpenaiAccountName'), parameters('AzureOpenAIEmbeddingModelName'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.CognitiveServices/accounts', parameters('OpenaiAccountName'))]",
+                "[resourceId('Microsoft.CognitiveServices/accounts/deployments', parameters('OpenaiAccountName'), parameters('AzureOpenAIGPTModelName'))]"
+            ],
+            "sku": {
+                "name": "Standard",
+                "capacity": 120
+            },
+            "properties": {
+                "model": {
+                    "format": "OpenAI",
+                    "name": "[parameters('AzureOpenAIEmbeddingModel')]",
+                    "version": "[parameters('AzureOpenAIEmbeddingModelVersion')]"
+                }
             }
         }
     ]

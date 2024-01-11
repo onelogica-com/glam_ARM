@@ -257,7 +257,7 @@
             ],
             "sku": {
                 "name": "Standard",
-                "capacity":300
+                "capacity":30
             },
             "properties": {
                 "model": {
@@ -276,7 +276,7 @@
             ],
             "sku": {
                 "name": "Standard",
-                "capacity": 300
+                "capacity": 30
             },
             "properties": {
                 "model": {

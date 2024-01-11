@@ -239,7 +239,7 @@
             "type": "Microsoft.CognitiveServices/accounts",
             "apiVersion": "2023-10-01-preview",
             "name": "[parameters('OpenaiAccountName')]",
-            "location": "canadaeast",
+            "location": "FRANCECENTRAL",
             "kind": "OpenAI",
             "sku": {
                 "name": "S0"

@@ -765,7 +765,7 @@
         },
         "dependsOn": [
         //   "[resourceId('Microsoft.Insights/components', parameters('ApplicationInsightsName'))]",
-          "[resourceId('Microsoft.Web/serverfarms', parameters('HostingPlanName'))]"
+        //   "[resourceId('Microsoft.Web/serverfarms', parameters('HostingPlanName'))]"
         //   "[resourceId('Microsoft.CognitiveServices/accounts', parameters('AzureOpenAIResource'))]",
         //   "[resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName'))]"
         ]

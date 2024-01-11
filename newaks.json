@@ -31,7 +31,7 @@
         }
     },
     "variables": {
-        "BlobContainerName": "documents"
+        "BlobContainerName": "glamdocuments"
     },
     "resources": [
         {

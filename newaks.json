@@ -68,9 +68,7 @@
                 "[resourceId('Microsoft.Storage/storageAccounts',  parameters('StorageAccountName'))]"
             ],
             "properties": {
-                "defaultEncryptionScope": "$account-encryption-key",
-                "denyEncryptionScopeOverride": false,
-                "publicAccess": "Blob"
+                "publicAccess": "none"
             }
         },
         {

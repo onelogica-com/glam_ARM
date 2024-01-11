@@ -416,7 +416,7 @@
             "type": "Microsoft.CognitiveServices/accounts",
             "apiVersion": "2023-10-01-preview",
             "name": "[parameters('OpenaiAccountName')]",
-            "location": "FRANCECENTRAL",
+            "location": "CANADAEAST",
             "kind": "OpenAI",
             "sku": {
                 "name": "S0"
@@ -434,7 +434,7 @@
             ],
             "sku": {
                 "name": "Standard",
-                "capacity": 120
+                "capacity": 50
             },
             "properties": {
                 "model": {
@@ -453,7 +453,7 @@
             ],
             "sku": {
                 "name": "Standard",
-                "capacity": 120
+                "capacity": 50
             },
             "properties": {
                 "model": {
@@ -472,7 +472,7 @@
             ],
             "sku": {
                 "name": "Standard",
-                "capacity": 10
+                "capacity": 16
             },
             "properties": {
                 "model": {
@@ -492,7 +492,7 @@
             ],
             "sku": {
                 "name": "Standard",
-                "capacity": 120
+                "capacity": 16
             },
             "properties": {
                 "model": {

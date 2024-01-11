@@ -270,6 +270,27 @@
         "metadata": {
           "description": "Name of App Service plan"
         }
+      },
+       "HostingPlanSku": {
+        "type": "string",
+        "defaultValue": "B3",
+        "allowedValues": [
+          "F1",
+          "D1",
+          "B1",
+          "B2",
+          "B3",
+          "S1",
+          "S2",
+          "S3",
+          "P1",
+          "P2",
+          "P3",
+          "P4"
+        ],
+        "metadata": {
+          "description": "The pricing tier for the App Service plan"
+        }
       }
         // "searchServices_textanalyticsvach_as36vn4dlyuy47k_externalid": {
         //     "defaultValue": "/subscriptions/f4e709ca-ccb8-4e46-b0b0-822db3762d86/resourceGroups/vach_onelogica/providers/Microsoft.Search/searchServices/textanalyticsvach-as36vn4dlyuy47k",
@@ -606,6 +627,19 @@
                 "collation": "en_US.utf8"
             }
         },
+              {
+        "type": "Microsoft.Web/serverfarms",
+        "apiVersion": "2020-06-01",
+        "name": "[parameters('HostingPlanName')]",
+        "location": "[parameters('Location')]",
+        "sku": {
+          "name": "[parameters('HostingPlanSku')]"
+        },
+        "properties": {
+          "reserved": true
+        },
+        "kind": "linux"
+      },
          {
         "type": "Microsoft.Web/sites",
         "apiVersion": "2020-06-01",

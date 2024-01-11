@@ -289,7 +289,7 @@
         {
             "type": "Microsoft.CognitiveServices/accounts/deployments",
             "apiVersion": "2023-10-01-preview",
-            "name": "[concat(parameters('OpenaiAccountName'),parameters('AzureOpenAIGPT4ModelName'))]",
+            "name": "[format('{0}/{1}',parameters('OpenaiAccountName'),parameters('AzureOpenAIGPT4ModelName'))]",
             "dependsOn": [
                 "[resourceId('Microsoft.CognitiveServices/accounts', parameters('OpenaiAccountName'))]"
             ],

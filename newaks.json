@@ -393,7 +393,7 @@
             "name": "[parameters('TextAnalyticsAccountName')]",
             "location": "[parameters('Location')]",
             "sku": {
-                "name": "F0"
+                "name": "S0"
             },
             "kind": "TextAnalytics",
             "identity": {

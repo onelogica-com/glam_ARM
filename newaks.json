@@ -119,56 +119,56 @@
             "metadata": {
                 "description": "Azure OpenAI GPT Model Version"
             }
-        },
-        "AzureOpenAITemperature": {
-            "type": "string",
-            "defaultValue": "0",
-            "metadata": {
-                "description": "Azure OpenAI Temperature"
-            }
-        },
-        "AzureOpenAITopP": {
-            "type": "string",
-            "defaultValue": "1",
-            "metadata": {
-                "description": "Azure OpenAI Top P"
-            }
-        },
-        "AzureOpenAIMaxTokens": {
-            "type": "string",
-            "defaultValue": "1000",
-            "metadata": {
-                "description": "Azure OpenAI Max Tokens"
-            }
-        },
-        "AzureOpenAIStopSequence": {
-            "type": "string",
-            "defaultValue": "\n",
-            "metadata": {
-                "description": "Azure OpenAI Stop Sequence"
-            }
-        },
-        "AzureOpenAISystemMessage": {
-            "type": "string",
-            "defaultValue": "You are an AI assistant that helps people find information.",
-            "metadata": {
-                "description": "Azure OpenAI System Message"
-            }
-        },
-        "AzureOpenAIApiVersion": {
-            "type": "string",
-            "defaultValue": "2023-07-01-preview",
-            "metadata": {
-                "description": "Azure OpenAI Api Version"
-            }
-        },
-        "AzureOpenAIStream": {
-            "type": "string",
-            "defaultValue": "true",
-            "metadata": {
-                "description": "Whether or not to stream responses from Azure OpenAI"
-            }
         }
+        // "AzureOpenAITemperature": {
+        //     "type": "string",
+        //     "defaultValue": "0",
+        //     "metadata": {
+        //         "description": "Azure OpenAI Temperature"
+        //     }
+        // },
+        // "AzureOpenAITopP": {
+        //     "type": "string",
+        //     "defaultValue": "1",
+        //     "metadata": {
+        //         "description": "Azure OpenAI Top P"
+        //     }
+        // },
+        // "AzureOpenAIMaxTokens": {
+        //     "type": "string",
+        //     "defaultValue": "1000",
+        //     "metadata": {
+        //         "description": "Azure OpenAI Max Tokens"
+        //     }
+        // },
+        // "AzureOpenAIStopSequence": {
+        //     "type": "string",
+        //     "defaultValue": "\n",
+        //     "metadata": {
+        //         "description": "Azure OpenAI Stop Sequence"
+        //     }
+        // },
+        // "AzureOpenAISystemMessage": {
+        //     "type": "string",
+        //     "defaultValue": "You are an AI assistant that helps people find information.",
+        //     "metadata": {
+        //         "description": "Azure OpenAI System Message"
+        //     }
+        // },
+        // "AzureOpenAIApiVersion": {
+        //     "type": "string",
+        //     "defaultValue": "2023-07-01-preview",
+        //     "metadata": {
+        //         "description": "Azure OpenAI Api Version"
+        //     }
+        // },
+        // "AzureOpenAIStream": {
+        //     "type": "string",
+        //     "defaultValue": "true",
+        //     "metadata": {
+        //         "description": "Whether or not to stream responses from Azure OpenAI"
+        //     }
+        // }
     },
     "variables": {
         "BlobContainerName": "glamdocuments",

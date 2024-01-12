@@ -80,7 +80,7 @@
         },
         "AzureOpenAIGPT4Model": {
             "type": "string",
-            "defaultValue": "gpt-4-32k",
+            "defaultValue": "gpt-4-Turbo",
             "metadata": {
                 "description": "Azure OpenAI  GPT 4 Model Deployment Name"
             }
@@ -416,7 +416,7 @@
             "type": "Microsoft.CognitiveServices/accounts",
             "apiVersion": "2023-10-01-preview",
             "name": "[parameters('OpenaiAccountName')]",
-            "location": "CANADAEAST",
+            "location": "EASTUS2",
             "kind": "OpenAI",
             "sku": {
                 "name": "S0"

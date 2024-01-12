@@ -603,31 +603,31 @@
             }
         },
 
-        {
-            "type": "Microsoft.DBforPostgreSQL/flexibleServers/databases",
-            "apiVersion": "2023-06-01-preview",
-            "name": "[concat(parameters('serverName'), '/anshupal')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.DBforPostgreSQL/flexibleServers', parameters('serverName'))]"
-            ],
-            "properties": {
-                "charset": "UTF8",
-                "collation": "en_US.utf8"
-            }
-        },
+        // {
+        //     "type": "Microsoft.DBforPostgreSQL/flexibleServers/databases",
+        //     "apiVersion": "2023-06-01-preview",
+        //     "name": "[concat(parameters('serverName'), '/anshupal')]",
+        //     "dependsOn": [
+        //         "[resourceId('Microsoft.DBforPostgreSQL/flexibleServers', parameters('serverName'))]"
+        //     ],
+        //     "properties": {
+        //         "charset": "UTF8",
+        //         "collation": "en_US.utf8"
+        //     }
+        // },
 
-        {
-            "type": "Microsoft.DBforPostgreSQL/flexibleServers/databases",
-            "apiVersion": "2023-06-01-preview",
-            "name": "[concat(parameters('serverName'), '/postgres')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.DBforPostgreSQL/flexibleServers', parameters('serverName'))]"
-            ],
-            "properties": {
-                "charset": "UTF8",
-                "collation": "en_US.utf8"
-            }
-        },
+        // {
+        //     "type": "Microsoft.DBforPostgreSQL/flexibleServers/databases",
+        //     "apiVersion": "2023-06-01-preview",
+        //     "name": "[concat(parameters('serverName'), '/postgres')]",
+        //     "dependsOn": [
+        //         "[resourceId('Microsoft.DBforPostgreSQL/flexibleServers', parameters('serverName'))]"
+        //     ],
+        //     "properties": {
+        //         "charset": "UTF8",
+        //         "collation": "en_US.utf8"
+        //     }
+        // },
         {
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2020-06-01",

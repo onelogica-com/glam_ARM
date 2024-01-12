@@ -80,7 +80,7 @@
         },
         "AzureOpenAIGPT4Model": {
             "type": "string",
-            "defaultValue": "gpt-4-Turbo",
+            "defaultValue": "gpt-4-32k",
             "metadata": {
                 "description": "Azure OpenAI  GPT 4 Model Deployment Name"
             }

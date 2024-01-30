@@ -370,6 +370,18 @@
             "metadata": {
                 "description": "Name your Virtual machine."
             }
+        },
+        "adminUsername":{
+            "type": "string",
+            "metadata": {
+                "description": "Name your Virtual machine."
+            }
+        },
+        "adminPassword":{
+             "type": "string",
+            "metadata": {
+                "description": "Name your Virtual machine."
+            }
         }
         // "searchServices_textanalyticsvach_as36vn4dlyuy47k_externalid": {
         //     "defaultValue": "/subscriptions/f4e709ca-ccb8-4e46-b0b0-822db3762d86/resourceGroups/vach_onelogica/providers/Microsoft.Search/searchServices/textanalyticsvach-as36vn4dlyuy47k",
@@ -514,7 +526,7 @@
             ],
             "sku": {
                 "name": "Standard",
-                "capacity": 50
+                "capacity": 10
             },
             "properties": {
                 "model": {
@@ -533,7 +545,7 @@
             ],
             "sku": {
                 "name": "Standard",
-                "capacity": 50
+                "capacity": 10
             },
             "properties": {
                 "model": {
@@ -552,7 +564,7 @@
             ],
             "sku": {
                 "name": "Standard",
-                "capacity": 16
+                "capacity": 10
             },
             "properties": {
                 "model": {
@@ -1047,13 +1059,12 @@
                 "servicePrincipalProfile": {
                     "clientId": "msi"
                 },
-                // "windowsProfile": {
-                //     "adminUsername": "[parameters('adminUsername')]",
-                //     "adminPassword": "[parameters('adminPassword')]",
+                "windowsProfile": {
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "enableCSIProxy": true
 
-                //     "enableCSIProxy": true
-
-                // },
+                },
                 "dnsPrefix": "[concat(parameters('aksDnsPrefix'),'-dns')]",
                 "apiServerAccessProfile": {
                     "enablePrivateCluster": true,

@@ -978,7 +978,8 @@
                         "offer": "windows-11",
                         "sku": "win11-22h2-pro",
                         "version": "latest"
-                    },
+                    }
+                },
                     "osProfile": {
                         "computerName": "[parameters('virtualMachines_glamvm_name')]",
                         "adminUsername": "[parameters('virtualMachines_glamvm_name')]"
@@ -990,12 +991,12 @@
                     },
                     "licenseType": "Windows_Client"
 
-                }
+                
             }
         },
         // Define AKS Cluster
         {
-            "apiVersion": "2021-03-01",
+            "apiVersion":"2023-08-02-preview",
             "type": "Microsoft.ContainerService/managedClusters",
             "name": "[parameters('aksClusterName')]",
             "location": "[parameters('location')]",

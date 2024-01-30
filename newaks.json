@@ -298,7 +298,73 @@
             "metadata": {
                 "description": "The pricing tier for the App Service plan"
             }
-        }
+        },
+         "virtualNetworkName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the virtual network."
+      }
+    },
+    "virtualNetworkAddressPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.0.0/16",
+      "metadata": {
+        "description": "Address space for the virtual network."
+      }
+    },
+    "vmSubnetAddressPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.1.0/24",
+      "metadata": {
+        "description": "Address space for the VM subnet."
+      }
+    },
+    "aksSubnetAddressPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.2.0/24",
+      "metadata": {
+        "description": "Address space for the AKS subnet."
+      }
+    },
+    "vmName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the virtual machine."
+      }
+    },
+    "aksClusterName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the AKS cluster."
+      }
+    },
+    "aksKubernetesVersion": {
+      "type": "string",
+      "defaultValue": "1.20.7",
+      "metadata": {
+        "description": "Kubernetes version for the AKS cluster."
+      }
+    },
+    "aksAgentPoolCount": {
+      "type": "int",
+      "defaultValue": 1,
+      "metadata": {
+        "description": "Number of agent nodes in the AKS cluster."
+      }
+    },
+    "aksAgentVMSize": {
+      "type": "string",
+      "defaultValue": "Standard_DS2_v2",
+      "metadata": {
+        "description": "VM size for AKS agent nodes."
+      }
+    },
+    "aksDnsPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "DNS prefix for the AKS cluster."
+      }
+    }
         // "searchServices_textanalyticsvach_as36vn4dlyuy47k_externalid": {
         //     "defaultValue": "/subscriptions/f4e709ca-ccb8-4e46-b0b0-822db3762d86/resourceGroups/vach_onelogica/providers/Microsoft.Search/searchServices/textanalyticsvach-as36vn4dlyuy47k",
         //     "type": "String"
@@ -825,8 +891,8 @@
             "properties": {
                 "serverFarmId": "[parameters('HostingPlanName')]",
                 "siteConfig": {
-                   
-                    "linuxFxVersion": "[variables('WebAppImageName')]"
+
+                    "linuxFxVersion": "[variables('WebAppServerImageName')]"
                 }
             },
             "dependsOn": [
@@ -840,21 +906,93 @@
             "type": "Microsoft.AzureActiveDirectory/domains",
             "apiVersion": "2021-07-01",
             "name": "[concat(parameters('WebsiteName'),'.azurewebsites.net')]",
-            "location":  "[parameters('Location')]",
+            "location": "[parameters('Location')]",
             "properties": {
                 "adminConsentDescription": "Admin consent for yourcustomdomain.com",
                 "adminConsentDisplayName": "Admin consent for yourcustomdomain.com",
                 "isDefault": false
             }
         },
-         {
-      "type": "Microsoft.AzureActiveDirectory/applications",
-      "apiVersion": "2021-07-01",
-      "name": "YourWebApp",
+        {
+            "type": "Microsoft.AzureActiveDirectory/applications",
+            "apiVersion": "2021-07-01",
+            "name": "YourWebApp",
+            "properties": {
+                "displayName": "Your Web App",
+                "signInAudience": "AzureADMyOrg",
+                "publicClient": false
+            }
+        },
+        {
+      "apiVersion": "2019-11-01",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[parameters('virtualNetworkName')]",
+      "location": "[parameters('location')]",
       "properties": {
-        "displayName": "Your Web App",
-        "signInAudience": "AzureADMyOrg",
-        "publicClient": false
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('virtualNetworkAddressPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "vmSubnet",
+            "properties": {
+              "addressPrefix": "[parameters('vmSubnetAddressPrefix')]"
+            }
+          },
+          {
+            "name": "aksSubnet",
+            "properties": {
+              "addressPrefix": "[parameters('aksSubnetAddressPrefix')]"
+            }
+          }
+        ]
+      }
+    },
+    // Define Virtual Machine
+    {
+      "apiVersion": "2019-03-01",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[parameters('vmName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+      ],
+      "properties": {
+        // VM properties here
+      }
+    },
+    // Define AKS Cluster
+    {
+      "apiVersion": "2021-03-01",
+      "type": "Microsoft.ContainerService/managedClusters",
+      "name": "[parameters('aksClusterName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+      ],
+      "properties": {
+        "kubernetesVersion": "[parameters('aksKubernetesVersion')]",
+        "networkProfile": {
+          "networkPlugin": "azure",
+          "serviceCidr": "10.0.0.0/16",
+          "dnsServiceIP": "10.0.0.10",
+          "dockerBridgeCidr": "172.17.0.1/16"
+        },
+        "agentPoolProfiles": [
+          {
+            "name": "agentpool1",
+            "count": "[parameters('aksAgentPoolCount')]",
+            "vmSize": "[parameters('aksAgentVMSize')]",
+            "osDiskSizeGB": 30
+          }
+        ],
+        "dnsPrefix": "[parameters('aksDnsPrefix')]",
+        "enablePrivateCluster": true,
+        "privateCluster": {
+          "enableNetworkPolicy": true
+        }
       }
     }
 

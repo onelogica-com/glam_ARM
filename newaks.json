@@ -964,11 +964,15 @@
       }
     },
     // Define AKS Cluster
-    {
+   {
       "apiVersion": "2021-03-01",
       "type": "Microsoft.ContainerService/managedClusters",
       "name": "[parameters('aksClusterName')]",
       "location": "[parameters('location')]",
+      "sku": {
+        "name": "Base",
+        "tier": "Free"
+      },
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
       ],
@@ -982,20 +986,32 @@
         },
         "agentPoolProfiles": [
           {
-            "name": "agentpool1",
+            "name": "agentpool",
             "count": "[parameters('aksAgentPoolCount')]",
             "vmSize": "[parameters('aksAgentVMSize')]",
-            "osDiskSizeGB": 30
+            "osDiskSizeGB": "managed",
+            "kubeletDiskType": "OS"
           }
         ],
-        "dnsPrefix": "[parameters('aksDnsPrefix')]",
-        "enablePrivateCluster": true,
-        "privateCluster": {
-          "enableNetworkPolicy": true
+        "servicePrincipalProfile": {
+          "clientId": "msi"
+        },
+        "windowsProfile": {
+          "adminUsername": "azureuser",
+          "enableCSIProxy": true
+        },
+        "dnsPrefix": "[concat(parameters('aksDnsPrefix'),'-dns')]",
+        "apiServerAccessProfile": {
+          "enablePrivateCluster": true,
+          "privateDNSZone": "system",
+          "enablePrivateClusterPublicFQDN": true
         }
+        // "enablePrivateCluster": true,
+        // "privateCluster": {
+        //   "enableNetworkPolicy": true
+        // }
       }
     }
-
 
     ]
 }

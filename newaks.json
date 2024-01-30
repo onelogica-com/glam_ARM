@@ -992,7 +992,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('vmName'))]",
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('virtualNetworkName'))]",
                             "properties": {
                                 "primary": true
                             }
@@ -1047,15 +1047,13 @@
                 "servicePrincipalProfile": {
                     "clientId": "msi"
                 },
-                "windowsProfile": {
-                    "adminUsername": "azureuser",
-                    "adminPassword": {
-                        "value": "MySecureP@ssw0rd123",
-                        "secret": true
-                    },
-                    "enableCSIProxy": true
+                // "windowsProfile": {
+                //     "adminUsername": "[parameters('adminUsername')]",
+                //     "adminPassword": "[parameters('adminPassword')]",
 
-                },
+                //     "enableCSIProxy": true
+
+                // },
                 "dnsPrefix": "[concat(parameters('aksDnsPrefix'),'-dns')]",
                 "apiServerAccessProfile": {
                     "enablePrivateCluster": true,

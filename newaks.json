@@ -50,6 +50,13 @@
                 "description": "Azure OpenAI GPT Model Name"
             }
         },
+        "AzureOpenAIGPTModelName_capatity": {
+            "type": "int",
+            "defaultValue": 10,
+            "metadata": {
+                "description": "Azure OpenAI GPT Model Name"
+            }
+        },
         "AzureOpenAIGPTModelVersion": {
             "type": "string",
             "defaultValue": "0613",
@@ -67,6 +74,13 @@
         "AzureOpenAIGPTModelName16k": {
             "type": "string",
             "defaultValue": "gpt-35-turbo-16k",
+            "metadata": {
+                "description": "Azure OpenAI 2nd GPT Model Name"
+            }
+        },
+        "AzureOpenAIGPTModelName16k_capatity":{
+              "type": "int",
+            "defaultValue": 10,
             "metadata": {
                 "description": "Azure OpenAI 2nd GPT Model Name"
             }
@@ -92,6 +106,13 @@
                 "description": "Azure OpenAI  GPT 4 Model Name"
             }
         },
+        "AzureOpenAIGPT4ModelName_capatity":{
+             "type": "int",
+            "defaultValue": 10,
+            "metadata": {
+                "description": "Azure OpenAI  GPT 4 Model Name"
+            }
+        },
         "AzureOpenAIGPT4ModelVersion": {
             "type": "string",
             "defaultValue": "0613",
@@ -111,6 +132,13 @@
             "defaultValue": "text-embedding-ada-002",
             "metadata": {
                 "description": "Azure OpenAI GPT Model Name"
+            }
+        },
+         "AzureOpenAIEmbeddingModelName_capatity": {
+            "type": "int",
+            "defaultValue": 10,
+            "metadata": {
+                "description": "Azure OpenAI GPT Model Name capacity"
             }
         },
         "AzureOpenAIEmbeddingModelVersion": {
@@ -552,7 +580,7 @@
             ],
             "sku": {
                 "name": "Standard",
-                "capacity": 10
+                "capacity":"[parameters('AzureOpenAIGPTModelName_capatity')]"
             },
             "properties": {
                 "model": {
@@ -571,7 +599,7 @@
             ],
             "sku": {
                 "name": "Standard",
-                "capacity": 10
+                "capacity":"[parameters('AzureOpenAIGPTModelName16k_capatity')]"
             },
             "properties": {
                 "model": {
@@ -590,7 +618,7 @@
             ],
             "sku": {
                 "name": "Standard",
-                "capacity": 10
+                 "capacity":"[parameters('AzureOpenAIGPT4ModelName_capatity')]"
             },
             "properties": {
                 "model": {
@@ -610,7 +638,7 @@
             ],
             "sku": {
                 "name": "Standard",
-                "capacity": 16
+                "capacity":"[parameters('AzureOpenAIEmbeddingModelName_capatity')]"
             },
             "properties": {
                 "model": {

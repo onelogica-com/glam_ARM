@@ -411,18 +411,6 @@
                 "description": "Name your Virtual machine."
             }
         },
-        "linuxAdminUsername": {
-            "type": "string",
-            "metadata": {
-                "description": "User name for the Linux Virtual Machines."
-            }
-        },
-        "sshRSAPublicKey": {
-            "type": "string",
-            "metadata": {
-                "description": "Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example 'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm'"
-            }
-        },
         "aksClusterEnablePrivateCluster": {
             "defaultValue": true,
             "type": "bool",

@@ -371,16 +371,42 @@
                 "description": "Name your Virtual machine."
             }
         },
-        "adminUsername":{
+        "adminUsername": {
             "type": "string",
             "metadata": {
                 "description": "Name your Virtual machine."
             }
         },
-        "adminPassword":{
-             "type": "string",
+        "adminPassword": {
+            "type": "string",
             "metadata": {
                 "description": "Name your Virtual machine."
+            }
+        },
+        "linuxAdminUsername": {
+            "type": "string",
+            "metadata": {
+                "description": "User name for the Linux Virtual Machines."
+            }
+        },
+        "sshRSAPublicKey": {
+            "type": "string",
+            "metadata": {
+                "description": "Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example 'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm'"
+            }
+        },
+        "aksClusterEnablePrivateCluster": {
+            "defaultValue": true,
+            "type": "bool",
+            "metadata": {
+                "description": "Specifies whether to create the cluster as a private cluster or not."
+            }
+        },
+        "disks_glamvm_disk1": {
+            // "defaultValue": "/subscriptions/f4e709ca-ccb8-4e46-b0b0-822db3762d86/resourceGroups/GLAMDEV-RG/providers/Microsoft.Compute/disks/glamvm_disk1_0d11046b172540ef8cbafa8f85f6578c",
+            "type": "String",
+            "metadata": {
+                "description": "virtual disk name"
             }
         }
         // "searchServices_textanalyticsvach_as36vn4dlyuy47k_externalid": {
@@ -992,9 +1018,37 @@
                         "version": "latest"
                     }
                 },
+                "osDisk": {
+                    "osType": "Windows",
+                    "name": "[concat(parameters('vmName'), '_disk1_0d11046b172540ef8cbafa8f85f6578c')]",
+                    "createOption": "FromImage",
+                    "caching": "ReadWrite",
+                    "managedDisk": {
+                        "storageAccountType": "StandardSSD_LRS",
+                        "id": "[parameters('disks_glamvm_disk1')]"
+                    },
+                    "deleteOption": "Delete",
+                    "diskSizeGB": 127
+                },
+                "dataDisks": [],
+                "diskControllerType": "SCSI",
+
                 "osProfile": {
                     "computerName": "[parameters('vmName')]",
-                    "adminUsername": "[parameters('vmName')]"
+                    "adminUsername": "[parameters('vmName')]",
+                    "windowsConfiguration": {
+                        "provisionVMAgent": true,
+                        "enableAutomaticUpdates": true,
+                        "patchSettings": {
+                            "patchMode": "AutomaticByOS",
+                            "assessmentMode": "ImageDefault",
+                            "enableHotpatching": false
+                        },
+                        "enableVMAgentPlatformUpdates": false
+                    },
+                    "secrets": [],
+                    "allowExtensionOperations": true,
+                    "requireGuestProvisionSignal": true
                 },
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
@@ -1004,9 +1058,9 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('virtualNetworkName'))]",
+                            "id": "[parameters('virtualNetworkName')]",
                             "properties": {
-                                "primary": true
+                                "deleteOption": "Detach"
                             }
                         }
                     ]
@@ -1022,6 +1076,9 @@
             "type": "Microsoft.ContainerService/managedClusters",
             "name": "[parameters('aksClusterName')]",
             "location": "[parameters('location')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
             "sku": {
                 "name": "Base",
                 "tier": "Free"
@@ -1041,9 +1098,6 @@
                     "dockerBridgeCidr": "172.17.0.1/16",
                     "serviceCidrs": [
                         "10.0.0.0/16"
-                    ],
-                    "ipFamilies": [
-                        "IPv4"
                     ]
                 },
                 "agentPoolProfiles": [
@@ -1051,9 +1105,9 @@
                         "name": "agentpool",
                         "count": "[parameters('aksAgentPoolCount')]",
                         "vmSize": "[parameters('aksAgentVMSize')]",
-                        "kubeletDiskType": "OS",
                         "osDiskSizeGB": 128,
-                        "mode": "System"
+                        "mode": "System",
+                        "osType": "Linux"
                     }
                 ],
                 "servicePrincipalProfile": {
@@ -1067,9 +1121,7 @@
                 },
                 "dnsPrefix": "[concat(parameters('aksDnsPrefix'),'-dns')]",
                 "apiServerAccessProfile": {
-                    "enablePrivateCluster": true,
-                    "privateDNSZone": "system",
-                    "enablePrivateClusterPublicFQDN": true
+                    "enablePrivateCluster": "[parameters('aksClusterEnablePrivateCluster')]"
                 }
                 // "enablePrivateCluster": true,
                 // "privateCluster": {

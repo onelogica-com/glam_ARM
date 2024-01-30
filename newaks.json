@@ -340,14 +340,14 @@
         },
         "aksKubernetesVersion": {
             "type": "string",
-            "defaultValue": "1.20.7",
+            "defaultValue": "1.26.10",
             "metadata": {
                 "description": "Kubernetes version for the AKS cluster."
             }
         },
         "aksAgentPoolCount": {
             "type": "int",
-            "defaultValue": 1,
+            "defaultValue": 2,
             "metadata": {
                 "description": "Number of agent nodes in the AKS cluster."
             }
@@ -365,8 +365,8 @@
                 "description": "DNS prefix for the AKS cluster."
             }
         },
-        "virtualMachines_glamvm_name":{
-             "type": "string",
+        "virtualMachines_glamvm_name": {
+            "type": "string",
             "metadata": {
                 "description": "Name your Virtual machine."
             }
@@ -980,23 +980,23 @@
                         "version": "latest"
                     }
                 },
-                    "osProfile": {
-                        "computerName": "[parameters('virtualMachines_glamvm_name')]",
-                        "adminUsername": "[parameters('virtualMachines_glamvm_name')]"
-                    },
-                    "diagnosticsProfile": {
-                        "bootDiagnostics": {
-                            "enabled": true
-                        }
-                    },
-                    "licenseType": "Windows_Client"
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachines_glamvm_name')]",
+                    "adminUsername": "[parameters('virtualMachines_glamvm_name')]"
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true
+                    }
+                },
+                "licenseType": "Windows_Client"
 
-                
+
             }
         },
         // Define AKS Cluster
         {
-            "apiVersion":"2023-08-02-preview",
+            "apiVersion": "2023-08-02-preview",
             "type": "Microsoft.ContainerService/managedClusters",
             "name": "[parameters('aksClusterName')]",
             "location": "[parameters('location')]",
@@ -1011,9 +1011,18 @@
                 "kubernetesVersion": "[parameters('aksKubernetesVersion')]",
                 "networkProfile": {
                     "networkPlugin": "azure",
+                    "networkPolicy": "calico",
+                    "networkDataplane": "azure",
+                    "loadBalancerSku": "Standard",
                     "serviceCidr": "10.0.0.0/16",
                     "dnsServiceIP": "10.0.0.10",
-                    "dockerBridgeCidr": "172.17.0.1/16"
+                    "dockerBridgeCidr": "172.17.0.1/16",
+                    "serviceCidrs": [
+                        "10.0.0.0/16"
+                    ],
+                    "ipFamilies": [
+                        "IPv4"
+                    ]
                 },
                 "agentPoolProfiles": [
                     {
@@ -1041,7 +1050,43 @@
                 //   "enableNetworkPolicy": true
                 // }
             }
+
+        },
+        {
+            "type": "Microsoft.ContainerService/managedClusters/agentPools",
+            "apiVersion": "2023-08-02-preview",
+            "name": "[concat(parameters('aksClusterName'), '/agentpool')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName'))]"
+            ],
+            "properties": {
+                "count": 2,
+                "vmSize": "Standard_DS2_v2",
+                "osDiskSizeGB": 128,
+                "osDiskType": "Managed",
+                "kubeletDiskType": "OS",
+                // "vnetSubnetID": "[concat(parameters('virtualNetworks_glamdev_rg_vnet_externalid'), '/subnets/default')]",
+                "maxPods": 110,
+                "type": "VirtualMachineScaleSets",
+                "maxCount": 5,
+                "minCount": 2,
+                "enableAutoScaling": true,
+                "powerState": {
+                    "code": "Running"
+                },
+                "orchestratorVersion": "1.26.10",
+                "enableNodePublicIP": false,
+                "mode": "System",
+                "osType": "Linux",
+                "osSKU": "Ubuntu",
+                "upgradeSettings": {},
+                "enableFIPS": false,
+                "securityProfile": {
+                    "sshAccess": "LocalUser"
+                }
+            }
         }
+
 
     ]
 }

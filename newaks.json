@@ -981,8 +981,8 @@
                     }
                 },
                 "osProfile": {
-                    "computerName": "[parameters('virtualMachines_glamvm_name')]",
-                    "adminUsername": "[parameters('virtualMachines_glamvm_name')]"
+                    "computerName": "[parameters('vmName')]",
+                    "adminUsername": "[parameters('vmName')]"
                 },
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
@@ -1031,7 +1031,7 @@
                         "vmSize": "[parameters('aksAgentVMSize')]",
                         "kubeletDiskType": "OS",
                         "osDiskSizeGB": 128,
-                        "mode": "System" 
+                        "mode": "System"
                     }
                 ],
                 "servicePrincipalProfile": {
@@ -1039,7 +1039,12 @@
                 },
                 "windowsProfile": {
                     "adminUsername": "azureuser",
+                    "adminPassword": {
+                        "value": "MySecureP@ssw0rd123",
+                        "secret": true
+                    },
                     "enableCSIProxy": true
+
                 },
                 "dnsPrefix": "[concat(parameters('aksDnsPrefix'),'-dns')]",
                 "apiServerAccessProfile": {
@@ -1053,6 +1058,40 @@
                 // }
             }
 
+        },
+        {
+            "type": "Microsoft.ContainerService/managedClusters/agentPools",
+            "apiVersion": "2023-08-02-preview",
+            "name": "[concat(parameters('aksClusterName'), '/agentpool')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName'))]"
+            ],
+            "properties": {
+                "count": 2,
+                "vmSize": "Standard_DS2_v2",
+                "osDiskSizeGB": 128,
+                "osDiskType": "Managed",
+                "kubeletDiskType": "OS",
+                // "vnetSubnetID": "[concat(parameters('virtualNetworks_glamdev_rg_vnet_externalid'), '/subnets/default')]",
+                "maxPods": 110,
+                "type": "VirtualMachineScaleSets",
+                "maxCount": 5,
+                "minCount": 2,
+                "enableAutoScaling": true,
+                "powerState": {
+                    "code": "Running"
+                },
+                "orchestratorVersion": "1.26.10",
+                "enableNodePublicIP": false,
+                "mode": "System",
+                "osType": "Linux",
+                "osSKU": "Ubuntu",
+                "upgradeSettings": {},
+                "enableFIPS": false,
+                "securityProfile": {
+                    "sshAccess": "LocalUser"
+                }
+            }
         }
 
 

@@ -78,8 +78,8 @@
                 "description": "Azure OpenAI 2nd GPT Model Name"
             }
         },
-        "AzureOpenAIGPTModelName16k_capatity":{
-              "type": "int",
+        "AzureOpenAIGPTModelName16k_capatity": {
+            "type": "int",
             "defaultValue": 10,
             "metadata": {
                 "description": "Azure OpenAI 2nd GPT Model Name"
@@ -106,8 +106,8 @@
                 "description": "Azure OpenAI  GPT 4 Model Name"
             }
         },
-        "AzureOpenAIGPT4ModelName_capatity":{
-             "type": "int",
+        "AzureOpenAIGPT4ModelName_capatity": {
+            "type": "int",
             "defaultValue": 10,
             "metadata": {
                 "description": "Azure OpenAI  GPT 4 Model Name"
@@ -134,7 +134,7 @@
                 "description": "Azure OpenAI GPT Model Name"
             }
         },
-         "AzureOpenAIEmbeddingModelName_capatity": {
+        "AzureOpenAIEmbeddingModelName_capatity": {
             "type": "int",
             "defaultValue": 10,
             "metadata": {
@@ -424,7 +424,47 @@
             "metadata": {
                 "description": "virtual disk name"
             }
-        }
+        },
+        "vmSize": {
+            "type": "string",
+            "defaultValue": "Standard_D2s_v5",
+            "metadata": {
+                "description": "Size of the virtual machine."
+            }
+        },
+        "dnsLabelPrefix": {
+      "type": "string",
+      "defaultValue": "[toLower(format('{0}-{1}', parameters('vmName'), uniqueString(resourceGroup().id, parameters('vmName'))))]",
+      "metadata": {
+        "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
+      }
+    },
+    "publicIpName": {
+      "type": "string",
+      "defaultValue": "myPublicIP",
+      "metadata": {
+        "description": "Name for the Public IP used to access the Virtual Machine."
+      }
+    },
+    "publicIPAllocationMethod": {
+      "type": "string",
+      "defaultValue": "Dynamic",
+      "allowedValues": [
+        "Dynamic",
+        "Static"
+      ],
+      "metadata": {
+        "description": "Allocation method for the Public IP used to access the Virtual Machine."
+      }
+    },
+    "publicIpSku": {
+      "type": "string",
+      "defaultValue": "Basic",
+      "allowedValues": [
+        "Basic",
+        "Standard"
+      ]
+    }
         // "searchServices_textanalyticsvach_as36vn4dlyuy47k_externalid": {
         //     "defaultValue": "/subscriptions/f4e709ca-ccb8-4e46-b0b0-822db3762d86/resourceGroups/vach_onelogica/providers/Microsoft.Search/searchServices/textanalyticsvach-as36vn4dlyuy47k",
         //     "type": "String"
@@ -483,7 +523,8 @@
         "BlobContainerName": "glamdocuments",
         "OpenAiName": "glam_openai",
         "WebAppImageName": "DOCKER|glamacr.azurecr.io/glamlatestdeployforweb:1.3",
-        "WebAppServerImageName": "DOCKER|glamacr.azurecr.io/severlatsettest:0.1"
+        "WebAppServerImageName": "DOCKER|glamacr.azurecr.io/severlatsettest:0.1",
+        "networkSecurityGroupName": "default-NSG"
     },
     "resources": [
         {
@@ -568,7 +609,7 @@
             ],
             "sku": {
                 "name": "Standard",
-                "capacity":"[parameters('AzureOpenAIGPTModelName_capatity')]"
+                "capacity": "[parameters('AzureOpenAIGPTModelName_capatity')]"
             },
             "properties": {
                 "model": {
@@ -587,7 +628,7 @@
             ],
             "sku": {
                 "name": "Standard",
-                "capacity":"[parameters('AzureOpenAIGPTModelName16k_capatity')]"
+                "capacity": "[parameters('AzureOpenAIGPTModelName16k_capatity')]"
             },
             "properties": {
                 "model": {
@@ -606,7 +647,7 @@
             ],
             "sku": {
                 "name": "Standard",
-                 "capacity":"[parameters('AzureOpenAIGPT4ModelName_capatity')]"
+                "capacity": "[parameters('AzureOpenAIGPT4ModelName_capatity')]"
             },
             "properties": {
                 "model": {
@@ -626,7 +667,7 @@
             ],
             "sku": {
                 "name": "Standard",
-                "capacity":"[parameters('AzureOpenAIEmbeddingModelName_capatity')]"
+                "capacity": "[parameters('AzureOpenAIEmbeddingModelName_capatity')]"
             },
             "properties": {
                 "model": {
@@ -962,25 +1003,63 @@
                 //   "[resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName'))]"
             ]
         },
+        // {
+        //     "type": "Microsoft.AzureActiveDirectory/domains",
+        //     "apiVersion": "2021-07-01",
+        //     "name": "[concat(parameters('WebsiteName'),'.azurewebsites.net')]",
+        //     "location": "[parameters('Location')]",
+        //     "properties": {
+        //         "adminConsentDescription": "Admin consent for yourcustomdomain.com",
+        //         "adminConsentDisplayName": "Admin consent for yourcustomdomain.com",
+        //         "isDefault": false
+        //     }
+        // },
+        // {
+        //     "type": "Microsoft.AzureActiveDirectory/applications",
+        //     "apiVersion": "2021-07-01",
+        //     "name": "YourWebApp",
+        //     "properties": {
+        //         "displayName": "Your Web App",
+        //         "signInAudience": "AzureADMyOrg",
+        //         "publicClient": false
+        //     }
+        // },
+         {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2022-05-01",
+      "name": "[parameters('publicIpName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('publicIpSku')]"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "[parameters('publicIPAllocationMethod')]",
+        "dnsSettings": {
+          "domainNameLabel": "[parameters('dnsLabelPrefix')]"
+        }
+      }
+    },
         {
-            "type": "Microsoft.AzureActiveDirectory/domains",
-            "apiVersion": "2021-07-01",
-            "name": "[concat(parameters('WebsiteName'),'.azurewebsites.net')]",
-            "location": "[parameters('Location')]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2022-05-01",
+            "name": "[variables('networkSecurityGroupName')]",
+            "location": "[parameters('location')]",
             "properties": {
-                "adminConsentDescription": "Admin consent for yourcustomdomain.com",
-                "adminConsentDisplayName": "Admin consent for yourcustomdomain.com",
-                "isDefault": false
-            }
-        },
-        {
-            "type": "Microsoft.AzureActiveDirectory/applications",
-            "apiVersion": "2021-07-01",
-            "name": "YourWebApp",
-            "properties": {
-                "displayName": "Your Web App",
-                "signInAudience": "AzureADMyOrg",
-                "publicClient": false
+                "securityRules": [
+                    {
+                        "name": "default-allow-3389",
+                        "properties": {
+                            "priority": 1000,
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "destinationPortRange": "3389",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*"
+                        }
+                    }
+                ]
             }
         },
         {
@@ -988,6 +1067,9 @@
             "type": "Microsoft.Network/virtualNetworks",
             "name": "[parameters('virtualNetworkName')]",
             "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+            ],
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
@@ -998,13 +1080,19 @@
                     {
                         "name": "vmSubnet",
                         "properties": {
-                            "addressPrefix": "[parameters('vmSubnetAddressPrefix')]"
+                            "addressPrefix": "[parameters('vmSubnetAddressPrefix')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+                            }
                         }
                     },
                     {
                         "name": "aksSubnet",
                         "properties": {
-                            "addressPrefix": "[parameters('aksSubnetAddressPrefix')]"
+                            "addressPrefix": "[parameters('aksSubnetAddressPrefix')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+                            }
                         }
                     }
                 ]
@@ -1024,7 +1112,7 @@
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "Standard_D2s_v3"
+                    "vmSize": "[parameters('vmSize')]"
                 },
                 "storageProfile": {
                     "imageReference": {
@@ -1036,15 +1124,10 @@
                 },
                 "osDisk": {
                     "osType": "Windows",
-                    "name": "[concat(parameters('vmName'), '_disk1_0d11046b172540ef8cbafa8f85f6578c')]",
                     "createOption": "FromImage",
-                    "caching": "ReadWrite",
                     "managedDisk": {
-                        "storageAccountType": "StandardSSD_LRS",
-                        "id": "[parameters('disks_glamvm_disk1')]"
-                    },
-                    "deleteOption": "Delete",
-                    "diskSizeGB": 127
+                        "storageAccountType": "StandardSSD_LRS"
+                    }
                 },
                 "dataDisks": [],
                 "diskControllerType": "SCSI",
@@ -1052,34 +1135,23 @@
                 "osProfile": {
                     "computerName": "[parameters('vmName')]",
                     "adminUsername": "[parameters('vmName')]",
-                    "windowsConfiguration": {
-                        "provisionVMAgent": true,
-                        "enableAutomaticUpdates": true,
-                        "patchSettings": {
-                            "patchMode": "AutomaticByOS",
-                            "assessmentMode": "ImageDefault",
-                            "enableHotpatching": false
-                        },
-                        "enableVMAgentPlatformUpdates": false
-                    },
-                    "secrets": [],
-                    "allowExtensionOperations": true,
-                    "requireGuestProvisionSignal": true
-                },
-                "diagnosticsProfile": {
-                    "bootDiagnostics": {
-                        "enabled": true
-                    }
+                    "adminPassword": "[parameters('adminPassword')]"
+
                 },
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[parameters('virtualNetworkName')]",
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',parameters('virtualNetworkName'))]",
                             "properties": {
                                 "deleteOption": "Detach"
                             }
                         }
                     ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true
+                    }
                 },
                 "licenseType": "Windows_Client"
 

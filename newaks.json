@@ -1120,8 +1120,7 @@
                         "offer": "windows-11",
                         "sku": "win11-22h2-pro",
                         "version": "latest"
-                    }
-                },
+                    },
                 "osDisk": {
                     "osType": "Windows",
                     "createOption": "FromImage",
@@ -1130,7 +1129,8 @@
                     }
                 },
                 "dataDisks": [],
-                "diskControllerType": "SCSI",
+                "diskControllerType": "SCSI"
+                },
 
                 "osProfile": {
                     "computerName": "[parameters('vmName')]",

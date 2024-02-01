@@ -1377,7 +1377,7 @@
                         "mode": "System",
                         "osType": "Linux",
                         "storageProfile": "ManagedDisks",
-                        "type": "VirtualMachineScaleSets",
+                        "type": "VirtualMachineScaleSets"
                         
                     }
                 ],

@@ -156,6 +156,20 @@
                 "description": "Name of Azure Translator Account"
             }
         },
+        "AzureTranslator_skufamily": {
+            "defaultValue": "S1",
+            "type": "string",
+            "allowedValues": [
+                "F0",
+                "S1",
+                "S2",
+                "S3",
+                "S4"
+            ],
+            "metadata": {
+                "description": "Name of Azure Translator Account"
+            }
+        },
         "ContentmoderatorAcountName": {
             // "defaultValue": "contentmoderatorglam",
             "defaultValue": "[format('{0}ContentModerator', parameters('ResourcePrefix'))]",
@@ -188,10 +202,36 @@
                 "basic",
                 "standard",
                 "standard2",
-                "standard3"
+                "standard3",
+                "storage_optimized_l1",
+                "storage_optimized_l2"
             ],
             "metadata": {
                 "description": "The SKU of the search service you want to create. E.g. free or standard"
+            }
+        },
+        "replicaCount": {
+            "type": "int",
+            "defaultValue": 1,
+            "maxValue": 12,
+            "minValue": 1,
+            "metadata": {
+                "description": "Replicas distribute search workloads across the service. You need at least two replicas to support high availability of query workloads (not applicable to the free tier)."
+            }
+        },
+        "partitionCount": {
+            "type": "int",
+            "defaultValue": 1,
+            "allowedValues": [
+                1,
+                2,
+                3,
+                4,
+                6,
+                12
+            ],
+            "metadata": {
+                "description": "Partitions allow for scaling of document count as well as faster indexing by sharding your index over multiple search units."
             }
         },
         "serverName": {
@@ -214,6 +254,14 @@
                 "description": "Database administrator password"
             }
         },
+        "availabilityZone": {
+            "type": "string",
+            "defaultValue": "1"
+        },
+        "skuSizeGB": {
+            "type": "int",
+            "defaultValue": 128
+        },
         "skuCapacity": {
             "type": "int",
             "defaultValue": 2,
@@ -221,11 +269,23 @@
                 "description": "Azure database for PostgreSQL compute capacity in vCores (2,4,8,16,32)"
             }
         },
+        "postgresFlexibleServersSkuTier": {
+            "type": "string",
+            "defaultValue": "Burstable",
+            "allowedValues": [
+                "Burstable",
+                "GeneralPurpose",
+                "MemoryOptimized"
+            ],
+            "metadata": {
+                "description": "The tier of the particular SKU, e.g. Burstable"
+            }
+        },
         "skuName": {
             "type": "string",
             "defaultValue": "Standard_B1ms",
             "metadata": {
-                "description": "Azure database for PostgreSQL sku name "
+                "description": "The name of the sku, typically, tier + family + cores, e.g. Standard_D4s_v3"
             }
         },
         "skuSizeMB": {
@@ -310,21 +370,26 @@
             "type": "string",
             "defaultValue": "B3",
             "allowedValues": [
-                "F1",
-                "D1",
                 "B1",
                 "B2",
                 "B3",
+                "D1",
+                "I1",
+                "I1v2",
+                "I2v2",
+                "I3v2",
+                "P1V2",
+                "P1V3",
+                "P2V2",
+                "P2V3",
+                "P3V2",
+                "P3V3",
                 "S1",
                 "S2",
-                "S3",
-                "P1",
-                "P2",
-                "P3",
-                "P4"
+                "S3"
             ],
             "metadata": {
-                "description": "The pricing tier for the App Service plan"
+                "description": "Sku and size of App Service Plan (F1 does not support virtual network integration)"
             }
         },
         "virtualNetworkName": {
@@ -354,6 +419,13 @@
                 "description": "Address space for the AKS subnet."
             }
         },
+        "dbAddressPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.2.0/24",
+            "metadata": {
+                "description": "Address space for the db subnet."
+            }
+        },
         "vmName": {
             "type": "string",
             "metadata": {
@@ -364,6 +436,17 @@
             "type": "string",
             "metadata": {
                 "description": "Name of the AKS cluster."
+            }
+        },
+        "aksClusterSkuTier": {
+            "type": "string",
+            "defaultValue": "Paid",
+            "allowedValues": [
+                "Paid",
+                "Free"
+            ],
+            "metadata": {
+                "description": "Specifies the tier of a managed cluster SKU: Paid or Free"
             }
         },
         "aksKubernetesVersion": {
@@ -406,7 +489,7 @@
             }
         },
         "adminPassword": {
-            "type": "string",
+            "type": "securestring",
             "metadata": {
                 "description": "Name your Virtual machine."
             }
@@ -558,6 +641,7 @@
 
     },
     "resources": [
+        // Blob storage
         {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2023-01-01",
@@ -618,11 +702,12 @@
                 "metadata": {}
             }
         },
+        // # open ai cognitive service
         {
             "type": "Microsoft.CognitiveServices/accounts",
             "apiVersion": "2023-10-01-preview",
             "name": "[parameters('OpenaiAccountName')]",
-            "location": "CanadaEast",
+            "location": "[parameters('Location')]",
             "kind": "OpenAI",
             "sku": {
                 "name": "S0"
@@ -631,6 +716,7 @@
                 "customSubDomainName": "[parameters('OpenaiAccountName')]"
             }
         },
+        // #gpt-32k
         {
             "type": "Microsoft.CognitiveServices/accounts/deployments",
             "apiVersion": "2023-10-01-preview",
@@ -650,6 +736,7 @@
                 }
             }
         },
+        // #gpt-16k
         {
             "type": "Microsoft.CognitiveServices/accounts/deployments",
             "apiVersion": "2023-10-01-preview",
@@ -669,6 +756,7 @@
                 }
             }
         },
+        // #gpt-4
         {
             "type": "Microsoft.CognitiveServices/accounts/deployments",
             "apiVersion": "2023-10-01-preview",
@@ -688,6 +776,7 @@
                 }
             }
         },
+        // #Embedding using for search indexing
         {
             "type": "Microsoft.CognitiveServices/accounts/deployments",
             "apiVersion": "2023-10-01-preview",
@@ -708,13 +797,15 @@
                 }
             }
         },
+        // #Azure Translator
         {
             "type": "Microsoft.CognitiveServices/accounts",
             "apiVersion": "2023-10-01-preview",
             "name": "[parameters('AzureTranslatorAccountName')]",
             "location": "[parameters('Location')]",
             "sku": {
-                "name": "S1"
+                "name": "[parameters('AzureTranslator_skufamily')]"
+                // "name": "S1"
             },
             "kind": "TextTranslation",
             "identity": {
@@ -725,6 +816,7 @@
                 "publicNetworkAccess": "Enabled"
             }
         },
+        // #Azure Moderator
         {
             "type": "Microsoft.CognitiveServices/accounts",
             "apiVersion": "2023-10-01-preview",
@@ -742,6 +834,7 @@
                 "publicNetworkAccess": "Enabled"
             }
         },
+        // #TextAnalytics
         {
             "type": "Microsoft.CognitiveServices/accounts",
             "apiVersion": "2023-10-01-preview",
@@ -758,6 +851,7 @@
                 "publicNetworkAccess": "Enabled"
             }
         },
+        // #Searcch Services using in QNA
         {
             "type": "Microsoft.Search/searchServices",
             "apiVersion": "2023-11-01",
@@ -770,11 +864,12 @@
                 "name": "[parameters('AzureCognitiveSearchSku')]"
             },
             "properties": {
-                "replicaCount": 1,
-                "partitionCount": 1
+                "replicaCount": "[parameters('replicaCount')]",
+                "partitionCount": "[parameters('partitionCount')]"
             }
 
         },
+        // #PostgresSql Flexible server
         {
             "type": "Microsoft.DBforPostgreSQL/flexibleServers",
             "apiVersion": "2023-06-01-preview",
@@ -782,58 +877,44 @@
             "location": "[parameters('Location')]",
             "sku": {
                 "name": "[parameters('skuName')]",
-                "tier": "Burstable"
+                "tier": "[parameters('postgresFlexibleServersSkuTier')]"
             },
+            "dependsOn": [
+                // "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDNSZoneName'))]",
+                // "[resourceId('Microsoft.Network/privateDnsZones/virtualNetworkLinks', variables('privateDNSZoneName'), variables('privateDNSZoneLinkName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+            ],
             "properties": {
                 "replica": {
                     "role": "Primary"
                 },
                 "storage": {
-                    "iops": 120,
-                    "tier": "P4",
-                    "storageSizeGB": 32
+                    "iops": 500,
+                    "tier": "P10",
+                    "storageSizeGB": "[parameters('skuSizeGB')]"
                 },
                 "network": {
-                    "publicNetworkAccess": "Disabled"
+                    "publicNetworkAccess": "Disabled",
+                    "delegatedSubnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'dbNet')]"
+                    // "privateDnsZoneArmResourceId": "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDNSZoneName'))]"
                 },
 
                 "version": "[parameters('postgresqlVersion')]",
                 "administratorLogin": "[parameters('administratorLogin')]",
                 "administratorLoginPassword": "[parameters('administratorLoginPassword')]", // Add this line
-                "availabilityZone": "1",
+                "availabilityZone": "[parameters('availabilityZone')]",
                 "backup": {
                     "backupRetentionDays": 7,
                     "geoRedundantBackup": "Disabled"
                 },
+                "highAvailability": {
+                    "mode": "SameZone",
+                    "standbyAvailabilityZone": "1"
+                },
                 "replicationRole": "Primary"
             }
         },
-
-        // {
-        //     "type": "Microsoft.DBforPostgreSQL/flexibleServers/databases",
-        //     "apiVersion": "2023-06-01-preview",
-        //     "name": "[concat(parameters('serverName'), '/anshupal')]",
-        //     "dependsOn": [
-        //         "[resourceId('Microsoft.DBforPostgreSQL/flexibleServers', parameters('serverName'))]"
-        //     ],
-        //     "properties": {
-        //         "charset": "UTF8",
-        //         "collation": "en_US.utf8"
-        //     }
-        // },
-
-        // {
-        //     "type": "Microsoft.DBforPostgreSQL/flexibleServers/databases",
-        //     "apiVersion": "2023-06-01-preview",
-        //     "name": "[concat(parameters('serverName'), '/postgres')]",
-        //     "dependsOn": [
-        //         "[resourceId('Microsoft.DBforPostgreSQL/flexibleServers', parameters('serverName'))]"
-        //     ],
-        //     "properties": {
-        //         "charset": "UTF8",
-        //         "collation": "en_US.utf8"
-        //     }
-        // },
+        // #Web App Services
         {
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2020-06-01",
@@ -862,7 +943,7 @@
         // },
         {
             "type": "Microsoft.Web/sites",
-            "apiVersion": "2020-06-01",
+            "apiVersion": "2021-03-01",
             "name": "[parameters('WebsiteName')]",
             "location": "[parameters('Location')]",
             "properties": {
@@ -1133,6 +1214,7 @@
                 ]
             }
         },
+        // #Virtual Network
         {
             "apiVersion": "2019-11-01",
             "type": "Microsoft.Network/virtualNetworks",
@@ -1165,6 +1247,15 @@
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
                             }
                         }
+                    },
+                    {
+                        "name": "dbNet",
+                        "properties": {
+                            "addressPrefix": "[parameters('dbAddressPrefix')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+                            }
+                        }
                     }
                 ]
             }
@@ -1175,9 +1266,9 @@
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[parameters('vmName')]",
             "location": "[parameters('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
-            ],
+            // "dependsOn": [
+            //     "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+            // ],
             "zones": [
                 "1"
             ],
@@ -1240,7 +1331,7 @@
             },
             "sku": {
                 "name": "Base",
-                "tier": "Free"
+                "tier": "[parameters('aksClusterSkuTier')]"
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"

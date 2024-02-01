@@ -1320,7 +1320,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName')s)]",
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]",
                             "properties": {
                                 "deleteOption": "Detach"
                             }

@@ -421,7 +421,7 @@
         },
         "dbAddressPrefix": {
             "type": "string",
-            "defaultValue": "10.0.2.0/24",
+            "defaultValue": "10.0.3.0/24",
             "metadata": {
                 "description": "Address space for the db subnet."
             }
@@ -1119,8 +1119,8 @@
             },
             "dependsOn": [
                 //   "[resourceId('Microsoft.Insights/components', parameters('ApplicationInsightsName'))]",
-                "[resourceId('Microsoft.Web/serverfarms', parameters('HostingPlanName'))]",
-                "[resourceId('Microsoft.Resources/deploymentScripts', variables('cliResourceName'))]"
+                "[resourceId('Microsoft.Web/serverfarms', parameters('HostingPlanName'))]"
+                // "[resourceId('Microsoft.Resources/deploymentScripts', variables('cliResourceName'))]"
                 //   "[resourceId('Microsoft.CognitiveServices/accounts', parameters('AzureOpenAIResource'))]",
                 //   "[resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName'))]"
             ]
@@ -1320,7 +1320,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',parameters('virtualNetworkName'))]",
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName')s)]",
                             "properties": {
                                 "deleteOption": "Detach"
                             }

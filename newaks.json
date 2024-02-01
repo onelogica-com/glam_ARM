@@ -835,6 +835,19 @@
             },
             "kind": "linux"
         },
+        //  {
+        //     "type": "Microsoft.Web/sites/config",
+        //     "apiVersion": "2018-11-01",
+        //     "name": "[concat(parameters('appName'), '/appsettings')]",
+        //     "location": "[resourceGroup().location]",
+        //     "dependsOn": [
+        //         "[resourceId('Microsoft.Web/sites', parameters('appName'))]",
+        //         "[resourceId('Microsoft.Resources/deploymentScripts', variables('cliResourceName'))]"
+        //     ],
+        //     "properties": {
+        //         "applicationId": "[reference(variables('cliResourceName')).outputs.appId]"
+        //     }
+        // },
         {
             "type": "Microsoft.Web/sites",
             "apiVersion": "2020-06-01",
@@ -998,7 +1011,8 @@
             },
             "dependsOn": [
                 //   "[resourceId('Microsoft.Insights/components', parameters('ApplicationInsightsName'))]",
-                "[resourceId('Microsoft.Web/serverfarms', parameters('HostingPlanName'))]"
+                "[resourceId('Microsoft.Web/serverfarms', parameters('HostingPlanName'))]",
+                "[resourceId('Microsoft.Resources/deploymentScripts', variables('cliResourceName'))]"
                 //   "[resourceId('Microsoft.CognitiveServices/accounts', parameters('AzureOpenAIResource'))]",
                 //   "[resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName'))]"
             ]
@@ -1259,20 +1273,8 @@
                 "cleanupPreference": "OnSuccess",
                 "retentionInterval": "P1D"
             }
-        },
-        {
-            "type": "Microsoft.Web/sites/config",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('appName'), '/appsettings')]",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('appName'))]",
-                "[resourceId('Microsoft.Resources/deploymentScripts', variables('cliResourceName'))]"
-            ],
-            "properties": {
-                "applicationId": "[reference(variables('cliResourceName')).outputs.appId]"
-            }
         }
+       
 
     ]
 }

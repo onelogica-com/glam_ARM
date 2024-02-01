@@ -442,7 +442,7 @@
             "type": "string",
             "defaultValue": "Paid",
             "allowedValues": [
-                "Paid",
+                "Standard'",
                 "Free"
             ],
             "metadata": {
@@ -1282,9 +1282,9 @@
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[parameters('vmName')]",
             "location": "[resourceGroup().location]",
-            // "dependsOn": [
-            //     "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
-            // ],
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('nicName'))]"
+            ],
             "zones": [
                 "1"
             ],
@@ -1355,6 +1355,7 @@
             ],
             "properties": {
                 "kubernetesVersion": "[parameters('aksKubernetesVersion')]",
+                // "dnsPrefix": "[parameters('dnsPrefix')]",
                 "networkProfile": {
                     "networkPlugin": "azure",
                     "networkPolicy": "calico",
@@ -1374,7 +1375,10 @@
                         "vmSize": "[parameters('aksAgentVMSize')]",
                         "osDiskSizeGB": 128,
                         "mode": "System",
-                        "osType": "Linux"
+                        "osType": "Linux",
+                        "storageProfile": "ManagedDisks",
+                        "type": "VirtualMachineScaleSets",
+                        
                     }
                 ],
                 "servicePrincipalProfile": {

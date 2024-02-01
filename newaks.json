@@ -465,16 +465,16 @@
                 "Standard"
             ]
         },
-        "appName":{
-             "type": "string",
+        "appName": {
+            "type": "string",
             "defaultValue": "my app"
         },
-        "identity":{
+        "identity": {
             "type": "string",
             "defaultValue": "identities"
         },
-        "utcValue":{
-              "type": "string",
+        "utcValue": {
+            "type": "string",
             "defaultValue": "identities"
 
         }
@@ -1118,7 +1118,7 @@
             }
         },
         // Define Virtual Machine
-        {
+     {
             "apiVersion": "2023-03-01",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[parameters('vmName')]",
@@ -1255,12 +1255,7 @@
                 "AzCliVersion": "2.0.80",
                 "timeout": "PT30M",
                 "arguments": "[variables('cliArg')]",
-                "scriptContent": "
-
-        appInfo=$(az ad app create --display-name $1 --identifier-uris \"$2\" --reply-urls \"$3\")
-        echo $appInfo > $AZ_SCRIPTS_OUTPUT_PATH
-
-        ",
+                "scriptContent": " appInfo=$(az ad app create --display-name $1 --identifier-uris \"$2\" --reply-urls \"$3\")echo $appInfo > $AZ_SCRIPTS_OUTPUT_PATH",
                 "cleanupPreference": "OnSuccess",
                 "retentionInterval": "P1D"
             }

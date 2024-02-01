@@ -463,19 +463,23 @@
             "allowedValues": [
                 "Basic",
                 "Standard"
-            ]
+            ],
+            "metadata": {
+                "description": "Set the public ip sku."
+            }
+
         },
         "appName": {
             "type": "string",
             "defaultValue": "my app",
-              "metadata": {
+            "metadata": {
                 "description": "aad  name."
             }
         },
         "identity": {
             "type": "string",
             "defaultValue": "identities",
-              "metadata": {
+            "metadata": {
                 "description": "user assigned identities."
             }
         },
@@ -790,7 +794,7 @@
                     "storageSizeGB": 32
                 },
                 "network": {
-                    "publicNetworkAccess": "Enabled"
+                    "publicNetworkAccess": "Disabled"
                 },
 
                 "version": "[parameters('postgresqlVersion')]",
@@ -1080,32 +1084,32 @@
                 }
             }
         },
-          {
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "2022-05-01",
-      "name": "[variables('nicName')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "privateIPAllocationMethod": "Dynamic",
-              "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpName'))]"
-              },
-              "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('subnetName'))]"
-              }
-            }
-          }
-        ]
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
-      ]
-    },
+        // {
+        //     "type": "Microsoft.Network/networkInterfaces",
+        //     "apiVersion": "2022-05-01",
+        //     "name": "[variables('nicName')]",
+        //     "location": "[parameters('location')]",
+        //     "properties": {
+        //         "ipConfigurations": [
+        //             {
+        //                 "name": "ipconfig1",
+        //                 "properties": {
+        //                     "privateIPAllocationMethod": "Dynamic",
+        //                     "publicIPAddress": {
+        //                         "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpName'))]"
+        //                     },
+        //                     "subnet": {
+        //                         "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('subnetName'))]"
+        //                     }
+        //                 }
+        //             }
+        //         ]
+        //     },
+        //     "dependsOn": [
+        //         "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpName'))]",
+        //         "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+        //     ]
+        // },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2022-05-01",

@@ -356,7 +356,7 @@
             "type": "string",
             "defaultValue": "[format('{0}-server', parameters('ResourcePrefix'))]",
             "metadata": {
-                "description": "Name of Web App"
+                "description": "Name of backend Web App"
             }
         },
         "HostingPlanName": {
@@ -501,11 +501,25 @@
                 "description": "Specifies whether to create the cluster as a private cluster or not."
             }
         },
-        "disks_glamvm_disk1": {
-            // "defaultValue": "/subscriptions/f4e709ca-ccb8-4e46-b0b0-822db3762d86/resourceGroups/GLAMDEV-RG/providers/Microsoft.Compute/disks/glamvm_disk1_0d11046b172540ef8cbafa8f85f6578c",
-            "type": "String",
+        // "disks_glamvm_disk1": {
+        //     // "defaultValue": "/subscriptions/f4e709ca-ccb8-4e46-b0b0-822db3762d86/resourceGroups/GLAMDEV-RG/providers/Microsoft.Compute/disks/glamvm_disk1_0d11046b172540ef8cbafa8f85f6578c",
+        //     "type": "String",
+        //     "metadata": {
+        //         "description": "virtual disk name"
+        //     }
+        // },
+        "templateIdentityName": {
+            "type": "string",
+            "defaultValue": "[substring(format('ImageGallery_{0}', guid(resourceGroup().id)), 0, 21)]",
             "metadata": {
-                "description": "virtual disk name"
+                "description": "Name of the user-assigned managed identity used by Azure Image Builder template, and for triggering the Azure Image Builder build at the end of the deployment"
+            }
+        },
+        "templateIdentityRoleDefinitionName": {
+            "type": "string",
+            "defaultValue": "[guid(resourceGroup().id)]",
+            "metadata": {
+                "description": "Permissions to allow for the user-assigned managed identity."
             }
         },
         "vmSize": {
@@ -637,7 +651,8 @@
         "aadAppRedirectUri": "[concat('https://', parameters('appName'), 'azurewebsites.net/signin-oidc')]",
         "cliArg": "[concat(parameters('appName'), ' ', variables('aadAppUri'), ' ', variables('aadAppRedirectUri'))]",
         "nicName": "myVMNic",
-        "subnetName": "Subnet"
+        "subnetName": "Subnet",
+        "templateIdentityRoleAssignmentName": "[guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('templateIdentityName')), resourceGroup().id, resourceId('Microsoft.Authorization/roleDefinitions', parameters('templateIdentityRoleDefinitionName')))]"
 
     },
     "resources": [
@@ -895,7 +910,7 @@
                 },
                 "network": {
                     "publicNetworkAccess": "Disabled",
-                    "delegatedSubnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'dbNet')]"
+                    "delegatedSubnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'postdbNet')]"
                     // "privateDnsZoneArmResourceId": "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDNSZoneName'))]"
                 },
 
@@ -949,7 +964,7 @@
             "properties": {
                 "serverFarmId": "[parameters('HostingPlanName')]",
                 "properties": {
-                    "ClientID": "[reference(resourceId('Microsoft.AzureActiveDirectory/applications', 'YourWebApp'), '2021-07-01').applicationId]",
+                    // "ClientID": "[reference(resourceId('Microsoft.AzureActiveDirectory/applications', 'YourWebApp'), '2021-07-01').applicationId]",
                     "SiteURL": "[concat('https://', parameters('WebsiteName'), '.azurewebsites.net')]"
                 },
                 "siteConfig": {
@@ -1165,32 +1180,7 @@
                 }
             }
         },
-        // {
-        //     "type": "Microsoft.Network/networkInterfaces",
-        //     "apiVersion": "2022-05-01",
-        //     "name": "[variables('nicName')]",
-        //     "location": "[parameters('location')]",
-        //     "properties": {
-        //         "ipConfigurations": [
-        //             {
-        //                 "name": "ipconfig1",
-        //                 "properties": {
-        //                     "privateIPAllocationMethod": "Dynamic",
-        //                     "publicIPAddress": {
-        //                         "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpName'))]"
-        //                     },
-        //                     "subnet": {
-        //                         "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('subnetName'))]"
-        //                     }
-        //                 }
-        //             }
-        //         ]
-        //     },
-        //     "dependsOn": [
-        //         "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpName'))]",
-        //         "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
-        //     ]
-        // },
+       
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2022-05-01",
@@ -1249,7 +1239,7 @@
                         }
                     },
                     {
-                        "name": "dbNet",
+                        "name": "postdbNet",
                         "properties": {
                             "addressPrefix": "[parameters('dbAddressPrefix')]",
                             "networkSecurityGroup": {
@@ -1259,6 +1249,32 @@
                     }
                 ]
             }
+        },
+         {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2022-05-01",
+            "name": "[variables('nicName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpName'))]"
+                            },
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('subnetName'))]"
+                            }
+                        }
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+            ]
         },
         // Define Virtual Machine
         {
@@ -1286,6 +1302,7 @@
                     "osDisk": {
                         "osType": "Windows",
                         "createOption": "FromImage",
+                         "caching": "ReadWrite",
                         "managedDisk": {
                             "storageAccountType": "StandardSSD_LRS"
                         }
@@ -1379,6 +1396,61 @@
                 // }
             }
 
+        },
+        {
+            "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+            "apiVersion": "2023-01-31",
+            "name": "[parameters('templateIdentityName')]",
+            "location": "[parameters('location')]"
+        },
+        {
+            "type": "Microsoft.Authorization/roleDefinitions",
+            "apiVersion": "2022-04-01",
+            "name": "[parameters('templateIdentityRoleDefinitionName')]",
+            "properties": {
+                "roleName": "[parameters('templateIdentityRoleDefinitionName')]",
+                "description": "Used for AIB template and ARM deployment script that runs AIB build",
+                "type": "customRole",
+                "permissions": [
+                    {
+                        "actions": [
+                            "Microsoft.Compute/galleries/read",
+                            "Microsoft.Compute/galleries/images/read",
+                            "Microsoft.Compute/galleries/images/versions/read",
+                            "Microsoft.Compute/galleries/images/versions/write",
+                            "Microsoft.Compute/images/read",
+                            "Microsoft.Compute/images/write",
+                            "Microsoft.Compute/images/delete",
+                            "Microsoft.Storage/storageAccounts/blobServices/containers/read",
+                            "Microsoft.Storage/storageAccounts/blobServices/containers/write",
+                            "Microsoft.ContainerInstance/containerGroups/read",
+                            "Microsoft.ContainerInstance/containerGroups/write",
+                            "Microsoft.ContainerInstance/containerGroups/start/action",
+                            "Microsoft.Resources/deployments/read",
+                            "Microsoft.Resources/deploymentScripts/read",
+                            "Microsoft.Resources/deploymentScripts/write",
+                            "Microsoft.VirtualMachineImages/imageTemplates/run/action"
+                        ]
+                    }
+                ],
+                "assignableScopes": [
+                    "[resourceGroup().id]"
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2022-04-01",
+            "name": "[variables('templateIdentityRoleAssignmentName')]",
+            "properties": {
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', parameters('templateIdentityRoleDefinitionName'))]",
+                "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('templateIdentityName')), '2023-01-31').principalId]",
+                "principalType": "ServicePrincipal"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('templateIdentityName'))]",
+                "[resourceId('Microsoft.Authorization/roleDefinitions', parameters('templateIdentityRoleDefinitionName'))]"
+            ]
         },
         {
             "type": "Microsoft.Resources/deploymentScripts",

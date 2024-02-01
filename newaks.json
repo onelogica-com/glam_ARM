@@ -550,7 +550,7 @@
         "aadAppRedirectUri": "[concat('https://', parameters('appName'), 'azurewebsites.net/signin-oidc')]",
         "cliArg": "[concat(parameters('appName'), ' ', variables('aadAppUri'), ' ', variables('aadAppRedirectUri'))]",
         "nicName": "myVMNic",
-        "subnetName": "Subnet",
+        "subnetName": "Subnet"
 
     },
     "resources": [

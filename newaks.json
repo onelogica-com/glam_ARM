@@ -467,11 +467,17 @@
         },
         "appName": {
             "type": "string",
-            "defaultValue": "my app"
+            "defaultValue": "my app",
+              "metadata": {
+                "description": "aad  name."
+            }
         },
         "identity": {
             "type": "string",
-            "defaultValue": "identities"
+            "defaultValue": "identities",
+              "metadata": {
+                "description": "user assigned identities."
+            }
         },
         "utcValue": {
             "type": "string",
@@ -542,7 +548,9 @@
         "appServicePlanName": "[concat('Plan-', parameters('appName'))]",
         "aadAppUri": "[concat('https://', parameters('appName'), 'azurewebsites.net')]",
         "aadAppRedirectUri": "[concat('https://', parameters('appName'), 'azurewebsites.net/signin-oidc')]",
-        "cliArg": "[concat(parameters('appName'), ' ', variables('aadAppUri'), ' ', variables('aadAppRedirectUri'))]"
+        "cliArg": "[concat(parameters('appName'), ' ', variables('aadAppUri'), ' ', variables('aadAppRedirectUri'))]",
+        "nicName": "myVMNic",
+        "subnetName": "Subnet",
 
     },
     "resources": [
@@ -1051,7 +1059,7 @@
         //     "type": "Microsoft.AzureActiveDirectory/applications",
         //     "apiVersion": "2021-07-01",
         //     "name": "YourWebApp",
-        //     "properties": {
+        //     "properties": {networkInterface
         //         "displayName": "Your Web App",
         //         "signInAudience": "AzureADMyOrg",
         //         "publicClient": false
@@ -1072,6 +1080,32 @@
                 }
             }
         },
+          {
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2022-05-01",
+      "name": "[variables('nicName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpName'))]"
+              },
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('subnetName'))]"
+              }
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+      ]
+    },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2022-05-01",
@@ -1132,7 +1166,7 @@
             }
         },
         // Define Virtual Machine
-     {
+        {
             "apiVersion": "2023-03-01",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[parameters('vmName')]",
@@ -1260,8 +1294,7 @@
             "identity": {
                 "type": "UserAssigned",
                 "userAssignedIdentities": {
-                    "[parameters('identity')]": {
-                    }
+                    "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('identity'))]": {}
                 }
             },
             "properties": {
@@ -1274,7 +1307,7 @@
                 "retentionInterval": "P1D"
             }
         }
-       
+
 
     ]
 }

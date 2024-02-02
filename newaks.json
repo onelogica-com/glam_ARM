@@ -440,7 +440,7 @@
         },
         "aksClusterSkuTier": {
             "type": "string",
-            "defaultValue": "Paid",
+            "defaultValue": "Standard",
             "allowedValues": [
                 "Standard'",
                 "Free"
@@ -1197,7 +1197,7 @@
                             "destinationPortRange": "3389",
                             "protocol": "Tcp",
                             "sourcePortRange": "*",
-                            "sourceAddressPrefix": "*",
+                            "sourceAddressPrefix": "Internet",
                             "destinationAddressPrefix": "*"
                         }
                     }
@@ -1265,7 +1265,7 @@
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpName'))]"
                             },
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('subnetName'))]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'vmSubnet')]"
                             }
                         }
                     }
@@ -1283,7 +1283,7 @@
             "name": "[parameters('vmName')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', variables('nicName'))]"
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
             ],
             "zones": [
                 "1"

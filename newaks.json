@@ -359,6 +359,10 @@
                 "description": "Name of backend Web App"
             }
         },
+        "privateDNSZoneName": {
+            "type": "string",
+            "defaultValue": ""
+        },
         "HostingPlanName": {
             "type": "string",
             "defaultValue": "[format('{0}-hosting-plan', parameters('ResourcePrefix'))]",
@@ -651,8 +655,13 @@
         "aadAppRedirectUri": "[concat('https://', parameters('appName'), 'azurewebsites.net/signin-oidc')]",
         "cliArg": "[concat(parameters('appName'), ' ', variables('aadAppUri'), ' ', variables('aadAppRedirectUri'))]",
         "nicName": "myVMNic",
-        "subnetName": "Subnet",
-        "templateIdentityRoleAssignmentName": "[guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('templateIdentityName')), resourceGroup().id, resourceId('Microsoft.Authorization/roleDefinitions', parameters('templateIdentityRoleDefinitionName')))]"
+        "vmsubnet": "vmSubnet",
+        "templateIdentityRoleAssignmentName": "[guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('templateIdentityName')), resourceGroup().id, resourceId('Microsoft.Authorization/roleDefinitions', parameters('templateIdentityRoleDefinitionName')))]",
+        "ACRServerUrl":"glamacr.azurecr.io",
+        "ACRUsername":"glamacr",
+        "ACRPassword":"12TJ1acaQ70DNlbpm/X4JJrLE9xy/UACQi0GiFeIV1+ACRDYRcIj"
+        
+
 
     },
     "resources": [
@@ -910,8 +919,8 @@
                 },
                 "network": {
                     "publicNetworkAccess": "Disabled",
-                    "delegatedSubnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'postdbNet')]"
-                    // "privateDnsZoneArmResourceId": "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDNSZoneName'))]"
+                    "delegatedSubnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'postdbNet')]",
+                    "privateDnsZoneArmResourceId": "[resourceId('Microsoft.Network/privateDnsZones', parameters('privateDNSZoneName'))]"
                 },
 
                 "version": "[parameters('postgresqlVersion')]",
@@ -1134,7 +1143,12 @@
                 "serverFarmId": "[parameters('HostingPlanName')]",
                 "siteConfig": {
 
-                    "linuxFxVersion": "[variables('WebAppServerImageName')]"
+                    "linuxFxVersion": "[variables('WebAppServerImageName')]",
+                    "dockerImageSourceRegistry": {
+                        "serverUrl": "[variables('ACRServerUrl')]",
+                        "username": "[variables('ACRUsername')]",
+                        "password": "[variables('ACRPassword')]"
+                    }
                 }
             },
             "dependsOn": [
@@ -1180,7 +1194,7 @@
                 }
             }
         },
-       
+
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2022-05-01",
@@ -1221,7 +1235,7 @@
                 },
                 "subnets": [
                     {
-                        "name": "vmSubnet",
+                        "name": "[variables('vmsubnet')]",
                         "properties": {
                             "addressPrefix": "[parameters('vmSubnetAddressPrefix')]",
                             "networkSecurityGroup": {
@@ -1250,7 +1264,7 @@
                 ]
             }
         },
-         {
+        {
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2022-05-01",
             "name": "[variables('nicName')]",
@@ -1265,7 +1279,7 @@
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpName'))]"
                             },
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'vmSubnet')]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('vmsubnet'))]"
                             }
                         }
                     }
@@ -1302,7 +1316,7 @@
                     "osDisk": {
                         "osType": "Windows",
                         "createOption": "FromImage",
-                         "caching": "ReadWrite",
+                        "caching": "ReadWrite",
                         "managedDisk": {
                             "storageAccountType": "StandardSSD_LRS"
                         }
@@ -1378,7 +1392,7 @@
                         "osType": "Linux",
                         "storageProfile": "ManagedDisks",
                         "type": "VirtualMachineScaleSets"
-                        
+
                     }
                 ],
                 "servicePrincipalProfile": {

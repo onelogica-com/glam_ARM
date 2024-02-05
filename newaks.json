@@ -588,6 +588,12 @@
             "type": "string",
             "defaultValue": "identities"
 
+        },
+        "azureADApplicationName": {
+            "type": "string",
+            "metadata": {
+                "description": "The display name of the application to create in Azure AD."
+            }
         }
         // "searchServices_textanalyticsvach_as36vn4dlyuy47k_externalid": {
         //     "defaultValue": "/subscriptions/f4e709ca-ccb8-4e46-b0b0-822db3762d86/resourceGroups/vach_onelogica/providers/Microsoft.Search/searchServices/textanalyticsvach-as36vn4dlyuy47k",
@@ -657,10 +663,10 @@
         "nicName": "myVMNic",
         "vmsubnet": "vmSubnet",
         "templateIdentityRoleAssignmentName": "[guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('templateIdentityName')), resourceGroup().id, resourceId('Microsoft.Authorization/roleDefinitions', parameters('templateIdentityRoleDefinitionName')))]",
-        "ACRServerUrl":"glamacr.azurecr.io",
-        "ACRUsername":"glamacr",
-        "ACRPassword":"12TJ1acaQ70DNlbpm/X4JJrLE9xy/UACQi0GiFeIV1+ACRDYRcIj"
-        
+        "ACRServerUrl": "glamacr.azurecr.io",
+        "ACRUsername": "glamacr",
+        "ACRPassword": "12TJ1acaQ70DNlbpm/X4JJrLE9xy/UACQi0GiFeIV1+ACRDYRcIj"
+
 
 
     },
@@ -1486,8 +1492,18 @@
                 "forceUpdateTag": "[parameters('utcValue')]",
                 "AzCliVersion": "2.0.80",
                 "timeout": "PT30M",
+                "environmentVariables": [
+                    {
+                        "name": "AzureADApplicationName",
+                        "value": "[parameters('azureADApplicationName')]"
+                    },
+                    {
+                        "name": "DomainName",
+                        "value": "[concat('https://', parameters('WebsiteName'), '.azurewebsites.net')]"
+                    }
+                ],
                 "arguments": "[variables('cliArg')]",
-                "scriptContent": " appInfo=$(az ad app create --display-name $1 --identifier-uris \"$2\" --reply-urls \"$3\")echo $appInfo > $AZ_SCRIPTS_OUTPUT_PATH",
+                "scriptContent": " appInfo=$(az ad app create --display-name $AzureADApplicationName --identifier-uris $DomainName)echo $appInfo > $AZ_SCRIPTS_OUTPUT_PATH",
                 "cleanupPreference": "OnSuccess",
                 "retentionInterval": "P1D"
             }

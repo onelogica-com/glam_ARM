@@ -22,12 +22,12 @@
       },
       "windowsOSVersion": {
         "type": "string",
-        "defaultValue": "2012-R2-Datacenter",
-        "allowedValues": [
-          "2008-R2-SP1",
-          "2012-Datacenter",
-          "2012-R2-Datacenter"
-        ],
+        "defaultValue": "win11-22h2-pro",
+        // "allowedValues": [
+        //   "2008-R2-SP1",
+        //   "2012-Datacenter",
+        //   "2012-R2-Datacenter"
+        // ],
         "metadata": {
           "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version. Allowed values: 2008-R2-SP1, 2012-Datacenter, 2012-R2-Datacenter."
         }
@@ -55,7 +55,7 @@
       },
       "vmSize": {
         "type": "string",
-        "defaultValue": "Standard_A2",
+        "defaultValue": "Standard_D2s_v3",
         "metadata": {
           "description": "The size of the VM"
         }
@@ -81,25 +81,11 @@
         "metadata": {
           "description": "Location for all resources."
         }
-      },
-      "_artifactsLocation": {
-        "type": "string",
-        "metadata": {
-          "description": "The base URI where artifacts required by this template are located including a trailing '/'"
-        },
-        "defaultValue": "[deployment().properties.templateLink.uri]"
-      },
-      "_artifactsLocationSasToken": {
-        "type": "securestring",
-        "metadata": {
-          "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated. Use the defaultValue if the staging location is not secured."
-        },
-        "defaultValue": ""
-      }    
+      }
     },
     "variables": {
-      "imagePublisher": "MicrosoftWindowsServer",
-      "imageOffer": "WindowsServer",
+      "imagePublisher": "microsoftwindowsdesktop",
+      "imageOffer": "windows-11",
       "nicName": "[parameters('nicName')]",
       "addressPrefix": "10.0.0.0/16",
       "subnetName": "[parameters('subnetName')]",

@@ -415,6 +415,18 @@
             "metadata": {
                 "description": "enter you tenantId"
             }
+        },
+        "clientID":{
+            "type": "securestring",
+            "metadata": {
+                "description": "enter the secret of the clent id"
+            }
+        },
+        "secret": {
+            "type": "securestring",
+            "metadata": {
+                "description": "enter the secret of the registered"
+            }
         }
     },
     "resources": [
@@ -530,11 +542,11 @@
                         },
                         {
                             "name": "CLIENT_SECRET",
-                            "value": ""
+                            "value": "[parameter('secret')]"
                         },
                         {
                             "name": "GLAM_CLIENT_ID",
-                            "vlaue": ""
+                            "vlaue": "[parameter('clientID')]"
                         },
                         {
                             "name": "GLAM_TENANT_ID",

@@ -1,0 +1,248 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "location": {
+        "type": "string",
+        "defaultValue": "East US",
+        "metadata": {
+          "description": "The Azure region where the resources will be deployed."
+        }
+      },
+      "frontendAppName": {
+        "type": "string",
+        "defaultValue": "frontendApp",
+        "metadata": {
+          "description": "The name of the frontend web app."
+        }
+      },
+      "backendAppName": {
+        "type": "string",
+        "defaultValue": "backendApp",
+        "metadata": {
+          "description": "The name of the backend web app."
+        }
+      },
+      "keyVaultName": {
+        "type": "string",
+        "defaultValue": "myKeyVault",
+        "metadata": {
+          "description": "The name of the Key Vault."
+        }
+      },
+      "keyVaultAccessObjectId": {
+        "type": "string",
+        "metadata": {
+          "description": "The Object ID of the user or application that will access the Key Vault."
+        }
+      },
+      "keyVaultSecrets": {
+        "type": "array",
+        "defaultValue": [
+          {
+            "name": "OpenAiApiKey",
+            "value": "replace-with-your-secret-value"
+          },
+          {
+            "name": "PostgresConnectionString",
+            "value": "replace-with-your-connection-string"
+          }
+        ],
+        "metadata": {
+          "description": "Array of secrets to create in the Key Vault."
+        }
+      },
+      "blobStorageName": {
+        "type": "string",
+        "defaultValue": "blobStorageAccount",
+        "metadata": {
+          "description": "The name of the Blob Storage account."
+        }
+      },
+      "blobContainers": {
+        "type": "array",
+        "defaultValue": ["finance", "hr", "Glamfilecontainer", "translatefiles"],
+        "metadata": {
+          "description": "The names of the blob storage containers."
+        }
+      },
+      "postgresqlServerName": {
+        "type": "string",
+        "defaultValue": "postgresqlServer",
+        "metadata": {
+          "description": "The name of the PostgreSQL server."
+        }
+      },
+      "postgresqlAdminUsername": {
+        "type": "string",
+        "defaultValue": "adminuser",
+        "metadata": {
+          "description": "The administrator username for PostgreSQL."
+        }
+      },
+      "postgresqlAdminPassword": {
+        "type": "securestring",
+        "metadata": {
+          "description": "The administrator password for PostgreSQL."
+        }
+      },
+      "postgresqlVersion": {
+        "type": "string",
+        "defaultValue": "14",
+        "allowedValues": ["11", "12", "13", "14"],
+        "metadata": {
+          "description": "The version of PostgreSQL."
+        }
+      },
+      "postgresqlStorageMB": {
+        "type": "int",
+        "defaultValue": 5120,
+        "metadata": {
+          "description": "The storage size for PostgreSQL in MB."
+        }
+      },
+      "textInsightsLanguageModelName": {
+        "type": "string",
+        "defaultValue": "textInsightsLanguageModel",
+        "metadata": {
+          "description": "The name of the Text Insights service for the Language model."
+        }
+      },
+      "textInsightsTranslatorModelName": {
+        "type": "string",
+        "defaultValue": "textInsightsTranslatorModel",
+        "metadata": {
+          "description": "The name of the Text Insights service for the Translator model."
+        }
+      },
+      "openAiServiceName": {
+        "type": "string",
+        "defaultValue": "openAiService",
+        "metadata": {
+          "description": "The name of the Azure OpenAI Service."
+        }
+      },
+      "qnaSearchServiceName": {
+        "type": "string",
+        "defaultValue": "qnaSearchService",
+        "metadata": {
+          "description": "The name of the Azure Cognitive Search service for QnA."
+        }
+      }
+    },
+    "resources": [
+      {
+        "type": "Microsoft.Web/serverfarms",
+        "apiVersion": "2022-03-01",
+        "name": "[concat(parameters('frontendAppName'), 'Plan')]",
+        "location": "[parameters('location')]",
+        "sku": {
+          "name": "P1V2",
+          "tier": "PremiumV2",
+          "size": "P1V2",
+          "family": "Pv2",
+          "capacity": 1
+        },
+        "properties": {}
+      },
+      {
+        "type": "Microsoft.Web/sites",
+        "apiVersion": "2022-03-01",
+        "name": "[parameters('frontendAppName')]",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Web/serverfarms', concat(parameters('frontendAppName'), 'Plan'))]"
+        ],
+        "properties": {
+          "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', concat(parameters('frontendAppName'), 'Plan'))]"
+        }
+      },
+      {
+        "type": "Microsoft.CognitiveServices/accounts",
+        "apiVersion": "2022-12-01",
+        "name": "[parameters('textInsightsLanguageModelName')]",
+        "location": "[parameters('location')]",
+        "sku": {
+          "name": "S0"
+        },
+        "kind": "CognitiveServices",
+        "properties": {}
+      },
+      {
+        "type": "Microsoft.CognitiveServices/accounts",
+        "apiVersion": "2022-12-01",
+        "name": "[parameters('textInsightsTranslatorModelName')]",
+        "location": "[parameters('location')]",
+        "sku": {
+          "name": "S0"
+        },
+        "kind": "CognitiveServices",
+        "properties": {}
+      },
+      {
+        "type": "Microsoft.CognitiveServices/accounts",
+        "apiVersion": "2022-12-01",
+        "name": "[parameters('openAiServiceName')]",
+        "location": "[parameters('location')]",
+        "sku": {
+          "name": "S0"
+        },
+        "kind": "OpenAI",
+        "properties": {
+          "apiProperties": {
+            "openaiModels": ["gpt-4", "gpt-35-turbo"]
+          }
+        }
+      },
+      {
+        "type": "Microsoft.KeyVault/vaults",
+        "apiVersion": "2022-07-01",
+        "name": "[parameters('keyVaultName')]",
+        "location": "[parameters('location')]",
+        "properties": {
+          "sku": {
+            "family": "A",
+            "name": "standard"
+          },
+          "tenantId": "[subscription().tenantId]",
+          "accessPolicies": [
+            {
+              "tenantId": "[subscription().tenantId]",
+              "objectId": "[parameters('keyVaultAccessObjectId')]",
+              "permissions": {
+                "secrets": ["get", "list", "set", "delete"]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "Microsoft.Storage/storageAccounts",
+        "apiVersion": "2022-09-01",
+        "name": "[parameters('blobStorageName')]",
+        "location": "[parameters('location')]",
+        "sku": {
+          "name": "Standard_LRS"
+        },
+        "kind": "StorageV2",
+        "properties": {
+          "supportsHttpsTrafficOnly": true
+        }
+      },
+      {
+        "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+        "apiVersion": "2022-09-01",
+        "name": "[concat(parameters('blobStorageName'), '/default/', parameters('blobContainers')[copyIndex()])]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Storage/storageAccounts', parameters('blobStorageName'))]"
+        ],
+        "properties": {},
+        "copy": {
+          "name": "containerCopyLoop",
+          "count": "[length(parameters('blobContainers'))]"
+        }
+      },
+      
+    ]
+  }
+   
